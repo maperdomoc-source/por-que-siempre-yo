@@ -259,13 +259,30 @@
        ============================================================ -->
   <div id="endScreen" class="screen-overlay hidden">
     <div id="endFloaties" class="absolute inset-0 overflow-hidden"></div>
+    <!-- Capa de lágrimas (solo visible en derrota) -->
+    <div id="tearsLayer" class="absolute inset-0 overflow-hidden pointer-events-none"></div>
 
     <div class="relative z-10 w-full max-w-md text-center flex flex-col items-center gap-6">
-      <div class="text-7xl text-amber-400 trophy-bounce"><i class="fa-solid fa-trophy"></i></div>
-      <h2 class="mega-title text-4xl sm:text-5xl text-amber-400">¡GANADOR!</h2>
-      <div class="bg-slate-900/80 border border-amber-500/40 rounded-3xl px-8 py-6 w-full">
-        <p class="text-slate-300 font-sans text-lg">El ganador es</p>
-        <p id="winnerName" class="font-display text-3xl text-pink-400 mt-1 break-words">Jugador</p>
+
+      <!-- ===== VISTA GANADOR ===== -->
+      <div id="winView" class="w-full flex flex-col items-center gap-6">
+        <div class="text-7xl text-amber-400 trophy-bounce"><i class="fa-solid fa-trophy"></i></div>
+        <h2 class="mega-title text-4xl sm:text-5xl text-amber-400">¡GANADOR!</h2>
+        <div class="bg-slate-900/80 border border-amber-500/40 rounded-3xl px-8 py-6 w-full">
+          <p class="text-slate-300 font-sans text-lg">El ganador es</p>
+          <p id="winnerName" class="font-display text-3xl text-pink-400 mt-1 break-words">Jugador</p>
+        </div>
+      </div>
+
+      <!-- ===== VISTA PERDEDOR ===== -->
+      <div id="loseView" class="w-full flex flex-col items-center gap-6 hidden">
+        <div class="text-7xl text-sky-400 sad-shake"><i class="fa-solid fa-face-sad-tear"></i></div>
+        <h2 class="mega-title text-4xl sm:text-5xl text-sky-400">¡PERDISTE!</h2>
+        <div class="bg-slate-900/80 border border-sky-500/40 rounded-3xl px-8 py-6 w-full">
+          <p class="text-slate-300 font-sans text-lg">Esta vez ganó</p>
+          <p id="loserWinnerName" class="font-display text-3xl text-pink-400 mt-1 break-words">Jugador</p>
+          <p class="text-slate-400 font-sans text-sm mt-2">¡Más suerte la próxima! 😢</p>
+        </div>
       </div>
 
       <p id="rematchStatus" class="text-amber-300 font-sans text-base min-h-[24px]"></p>

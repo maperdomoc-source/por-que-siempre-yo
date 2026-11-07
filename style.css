@@ -171,6 +171,36 @@
   100% { transform: translateY(-110vh) scale(1.1); opacity: 0; }
 }
 
+/* ====== DERROTA: lágrimas cayendo + emoji tembloroso ====== */
+.tear-drop {
+  position: absolute;
+  top: -40px;
+  width: 12px;
+  height: 18px;
+  /* Forma de gota: redonda abajo, puntuda arriba */
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: linear-gradient(180deg, #bae6fd, #38bdf8 60%, #0284c7);
+  box-shadow: inset 0 -2px 3px rgba(255,255,255,0.5), 0 2px 4px rgba(2,132,199,0.4);
+  opacity: 0.85;
+  animation: tearFall linear forwards;
+  pointer-events: none;
+}
+
+@keyframes tearFall {
+  0%   { transform: translateY(0)      rotate(180deg); opacity: 0; }
+  10%  { opacity: 0.9; }
+  100% { transform: translateY(110vh)  rotate(180deg); opacity: 0.2; }
+}
+
+.sad-shake { animation: sadShake 1.4s ease-in-out infinite; }
+
+@keyframes sadShake {
+  0%, 100% { transform: translateY(0)    rotate(-4deg); }
+  25%      { transform: translateY(2px)  rotate(3deg);  }
+  50%      { transform: translateY(-2px) rotate(-3deg); }
+  75%      { transform: translateY(2px)  rotate(4deg);  }
+}
+
 /* Big pulsing title on start screen */
 .mega-title {
   font-family: 'Righteous', cursive;

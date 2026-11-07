@@ -103,6 +103,24 @@ function playWinSound() {
   tone(1318.5, t + 0.6, 0.5, 'triangle', 0.25);
 }
 
+// "trombón triste" (wah-wah-wah-waaah) al perder
+function playLoseSound() {
+  const ctx = ensureAudio();
+  if (!ctx) return;
+  const t = ctx.currentTime;
+  // Cuatro notas descendentes con glissando, timbre nasal tipo trombón
+  const steps = [
+    { f: 311.13, to: 293.66 }, // Eb4 -> D4
+    { f: 277.18, to: 261.63 }, // Db4 -> C4
+    { f: 246.94, to: 233.08 }, // B3  -> Bb4
+    { f: 220.00, to: 174.61 }, // A3  -> F3 (la caída larga final)
+  ];
+  steps.forEach((s, i) => {
+    const dur = i === steps.length - 1 ? 0.8 : 0.28;
+    tone(s.f, t + i * 0.3, dur, 'sawtooth', 0.22, s.to);
+  });
+}
+
 // ============================================================
 //  PANTALLAS (Inicio / Juego / Fin)
 // ============================================================
@@ -246,6 +264,9 @@ function resetRoundState() {
   if (pit) pit.innerHTML = '';
   const diceVal = document.getElementById('diceValue');
   if (diceVal) diceVal.innerText = '?';
+  // Limpiar lágrimas de una derrota anterior
+  const tears = document.getElementById('tearsLayer');
+  if (tears) tears.innerHTML = '';
 }
 
 // ============================================================
@@ -584,7 +605,7 @@ function checkWinCondition() {
   if (curPlayer.marbles <= 0) {
     gameState.isGameOver = true;
     logAction(`🏆 ¡${curPlayer.name} HA GANADO LA PARTIDA!`);
-    triggerWin(curPlayer.name);
+    triggerGameOver(curPlayer.name, curPlayer.id);
     if (gameState.gameType === 'online' && gameState.isHost) {
       broadcastToGuests({ type: 'GAME_OVER', winnerName: curPlayer.name, winnerIdx: curPlayer.id });
     }
@@ -593,19 +614,44 @@ function checkWinCondition() {
   return false;
 }
 
-// Mostrar pantalla de fin + confetti (en este dispositivo)
-function triggerWin(winnerName) {
-  playWinSound();
-  const nameEl = document.getElementById('winnerName');
-  if (nameEl) nameEl.innerText = winnerName;
+// ¿Ganó ESTE dispositivo?
+//  - Online: compara el índice del ganador con mi índice de jugador.
+//  - Local (1 vs BOT): el humano siempre es el índice 0; gana si winnerIdx === 0.
+function didIWin(winnerIdx) {
+  if (gameState.gameType === 'online') return winnerIdx === gameState.myPlayerIndex;
+  return winnerIdx === 0;
+}
 
-  const rematchBox = document.getElementById('rematchStatus');
-  if (rematchBox) rematchBox.innerText = '';
+// Mostrar pantalla de fin adecuada (ganador o perdedor) en ESTE dispositivo
+function triggerGameOver(winnerName, winnerIdx) {
+  const iWon = didIWin(winnerIdx);
+
+  // Botón "Volver a jugar" habilitado en ambos casos
   const btnRematch = document.getElementById('btnRematch');
   if (btnRematch) { btnRematch.disabled = false; btnRematch.classList.remove('opacity-50'); }
+  const rematchBox = document.getElementById('rematchStatus');
+  if (rematchBox) rematchBox.innerText = '';
 
-  showScreen('end');
-  fireConfetti();
+  const winView  = document.getElementById('winView');
+  const loseView = document.getElementById('loseView');
+
+  if (iWon) {
+    if (winView)  winView.classList.remove('hidden');
+    if (loseView) loseView.classList.add('hidden');
+    const nameEl = document.getElementById('winnerName');
+    if (nameEl) nameEl.innerText = winnerName;
+    playWinSound();
+    showScreen('end');
+    fireConfetti();
+  } else {
+    if (loseView) loseView.classList.remove('hidden');
+    if (winView)  winView.classList.add('hidden');
+    const loserMsgEl = document.getElementById('loserWinnerName');
+    if (loserMsgEl) loserMsgEl.innerText = winnerName;
+    playLoseSound();
+    showScreen('end');
+    fireTears();
+  }
 }
 
 function fireConfetti() {
@@ -617,6 +663,27 @@ function fireConfetti() {
     if (Date.now() < end) requestAnimationFrame(frame);
   })();
   confetti({ particleCount: 180, spread: 100, origin: { y: 0.5 } });
+}
+
+// Lluvia de lágrimas en la pantalla de derrota (gotas azules que caen)
+function fireTears() {
+  const layer = document.getElementById('tearsLayer');
+  if (!layer) return;
+  layer.innerHTML = '';
+  for (let i = 0; i < 40; i++) {
+    const drop = document.createElement('div');
+    drop.className = 'tear-drop';
+    drop.style.left = Math.random() * 100 + 'vw';
+    drop.style.animationDuration = (1.6 + Math.random() * 1.8) + 's';
+    drop.style.animationDelay = (Math.random() * 2.5) + 's';
+    // Tamaño variable sin tocar 'transform' (lo controla la animación de caída)
+    const scale = 0.6 + Math.random() * 1.0;
+    drop.style.width = (12 * scale) + 'px';
+    drop.style.height = (18 * scale) + 'px';
+    layer.appendChild(drop);
+  }
+  // Limpiar las gotas tras unos segundos para no acumular nodos
+  setTimeout(() => { if (layer) layer.innerHTML = ''; }, 8000);
 }
 
 // ============================================================
@@ -937,7 +1004,7 @@ function handleIncomingNetworkData(conn, data) {
         break;
       case 'GAME_OVER':
         gameState.isGameOver = true;
-        triggerWin(data.winnerName);
+        triggerGameOver(data.winnerName, data.winnerIdx);
         break;
       case 'REMATCH_STATUS': {
         const statusEl = document.getElementById('rematchStatus');
