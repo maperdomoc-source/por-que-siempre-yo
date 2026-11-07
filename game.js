@@ -732,9 +732,14 @@ function createOnlineRoom() {
   gameState.players = [{ id: 0, name: nickname, isBot: false, marbles: gameState.marblesPerPlayer, style: MARBLE_STYLES[0] }];
 
   initPeerJS(peerId, () => {
-    document.getElementById('roomCodeDisplay').classList.remove('hidden');
+    const display = document.getElementById('roomCodeDisplay');
+    display.classList.remove('hidden');
     document.getElementById('roomCodeText').innerText = code;
     document.getElementById('roomConnectedCount').innerText = `Conectados: 1 (${nickname})`;
+    // En móviles (iPhone), desplazar la vista hasta el código para que siempre sea visible.
+    setTimeout(() => {
+      try { display.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+    }, 150);
   });
 }
 

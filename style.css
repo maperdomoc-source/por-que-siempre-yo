@@ -121,8 +121,14 @@
    ============================================================ */
 .screen-overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 60;
+  /* Altura real del viewport, con fallbacks para iOS Safari */
+  height: 100vh;
+  height: -webkit-fill-available;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -130,14 +136,17 @@
   justify-content: safe center;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 2rem 1.5rem;
+  /* Padding con safe-area para notch/barra inferior de iPhone */
+  padding: calc(2rem + env(safe-area-inset-top)) 1.5rem calc(3rem + env(safe-area-inset-bottom));
   background:
     radial-gradient(circle at 20% 20%, rgba(251, 191, 36, 0.12), transparent 40%),
     radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.12), transparent 40%),
     linear-gradient(160deg, #1e1b4b, #020617 60%);
 }
 
-/* El contenido interno nunca queda pegado a los bordes al hacer scroll */
+/* El contenido interno nunca queda pegado a los bordes al hacer scroll.
+   Usamos padding en el eje vertical (no margin:auto) para que, cuando el
+   contenido excede la altura, TODO quede dentro del área scrolleable. */
 .screen-overlay > .relative {
   margin: auto 0;
   flex-shrink: 0;
