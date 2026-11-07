@@ -322,48 +322,32 @@ body, .screen-overlay, #gameScreen {
 @keyframes waitBlink { 0%,80%,100%{transform:scale(0.6);opacity:0.4;} 40%{transform:scale(1);opacity:1;} }
 
 /* ============================================================
-   MÓVIL — compactar para que TODO entre sin scroll
+   MÓVIL — tablero grande y proporcional; se permite scroll
+   (con auto-scroll manejado por JS: baja al dado al lanzar,
+    sube al tablero cuando toca poner la canica)
    ============================================================ */
 @media (max-width: 860px) {
-  .dice-3d { width: 60px; height: 60px; }
+  .dice-3d { width: 72px; height: 72px; }
 }
 
 @media (max-width: 760px) {
-  /* El juego ocupa exactamente la altura de la pantalla, sin scroll */
-  #gameScreen { height: 100vh; height: 100dvh; overflow: hidden; }
+  /* El juego fluye y permite scroll natural cuando hace falta */
+  #gameScreen { min-height: 100dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
   #gameScreen main {
-    gap: 0.4rem;
-    padding: 0.4rem 0.5rem calc(0.4rem + env(safe-area-inset-bottom));
+    gap: 0.9rem;
+    padding: 0.8rem 0.9rem calc(1.2rem + env(safe-area-inset-bottom));
     justify-content: flex-start;
   }
 
-  /* Jugadores arriba, compactos y en fila */
-  #playersPanel { gap: 0.4rem; order: 1 !important; width: 100%; }
-  #playersPanel .panel-card { padding: 0.5rem 0.6rem; }
-  /* En móvil ocultamos la lista de canicas (dejamos solo el número) para ahorrar alto */
-  #playersPanel .panel-card .flex-wrap { display: none; }
+  /* Jugadores arriba, en fila, compactos pero legibles */
+  #playersPanel { gap: 0.5rem; order: 1 !important; width: 100%; }
 
-  /* Tablero: que no sea tan alto; limitado por el espacio disponible */
-  #gameScreen main > div:nth-child(2) { order: 2 !important; max-width: min(78vw, 46vh); }
+  /* Tablero GRANDE y cuadrado (proporcional): ocupa casi todo el ancho */
+  #gameScreen main > div:nth-child(2) { order: 2 !important; max-width: 100%; width: 100%; }
+  #gameScreen main > div:nth-child(2) > .wood-frame { max-width: 440px; margin: 0 auto; }
 
-  /* Panel de turno + dado compacto abajo, en fila */
-  #gameScreen main > div:nth-child(3) {
-    order: 3 !important;
-    flex-direction: row;
-    gap: 0.6rem;
-    padding: 0.6rem 0.8rem;
-    align-items: center;
-    justify-content: space-between;
-  }
-  #gameScreen main > div:nth-child(3) > * { margin: 0; }
-  #turnIndicator { padding: 0.4rem 0.6rem; }
-  #actionLog { display: none; }         /* el log ocupa mucho; en móvil usamos solo la pista */
-  #btnPass { width: auto; padding: 0.6rem 1rem; }
-  .dice-3d { width: 56px; height: 56px; }
-}
+  /* Panel de turno + dado debajo, cómodo */
+  #gameScreen main > div:nth-child(3) { order: 3 !important; width: 100%; }
 
-/* Pantallas muy bajas (celulares pequeños / apaisado) */
-@media (max-height: 700px) and (max-width: 760px) {
-  .dice-3d { width: 50px; height: 50px; }
-  #gameScreen main > div:nth-child(2) { max-width: min(62vw, 40vh); }
+  .dice-3d { width: 76px; height: 76px; }
 }

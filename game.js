@@ -498,6 +498,7 @@ function setBoardTheme() { /* El tablero colombiano es único; función conserva
 // Clic/toque del dado = lanzar (reemplaza al botón). Pide permiso de sensor en iOS.
 function handleDiceTap() {
   enableMotionIfNeeded();
+  scrollToDice();   // en móvil, asegura que el dado quede centrado al lanzar
   handleRollDice();
 }
 
@@ -550,8 +551,25 @@ function executeRoll(rolledValue, playerIdx) {
       renderBoardHoles();
       updateTurnUI();
       logAction(`🎯 ${curPlayer.name} sacó un ${rolledValue}. ¡Presiona la casilla ${rolledValue}!`);
+      // En móvil: subir automáticamente al tablero para poner la canica
+      if (isMyTurnNow()) scrollToBoard();
     }
   }, 650);
+}
+
+// ---------- AUTO-SCROLL EN MÓVIL ----------
+function isMobileView() {
+  return window.matchMedia && window.matchMedia('(max-width: 760px)').matches;
+}
+function scrollToBoard() {
+  if (!isMobileView()) return;
+  const el = document.getElementById('boardSurface');
+  if (el) setTimeout(() => { try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} }, 120);
+}
+function scrollToDice() {
+  if (!isMobileView()) return;
+  const el = document.getElementById('dice3d');
+  if (el) setTimeout(() => { try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} }, 100);
 }
 
 function handleHoleClick(clickedHoleNum) {
