@@ -55,7 +55,8 @@ O simplemente abre `index.html` en tu navegador.
 ```
 .
 ├── index.html    # Estructura y pantallas
-├── style.css     # Estilos (tablero 3D, canicas, pantallas)
+├── style.css     # Estilos (estética colombiana, tablero, canicas)
+├── assets.js     # Gráficos SVG (canica tricolor, stickers, hojas talladas)
 ├── game.js       # Lógica del juego, sonidos y multijugador online
 ├── netlify.toml  # Config de despliegue en Netlify
 └── README.md

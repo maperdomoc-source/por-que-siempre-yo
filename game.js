@@ -4,12 +4,22 @@
    ============================================================ */
 
 // ---------- CONSTANTES ----------
+// Todas las canicas son la tricolor colombiana; cada jugador se distingue
+// por el color de su anillo (ring) y una etiqueta de color.
 const MARBLE_STYLES = [
-  { name: 'Verde Esmeralda', class: 'marble-green',   colorHex: '#22c55e' },
-  { name: 'Azul Turquesa',   class: 'marble-teal',    colorHex: '#14b8a6' },
-  { name: 'Ámbar Dorado',    class: 'marble-amber',   colorHex: '#eab308' },
-  { name: 'Magenta Cristal', class: 'marble-magenta', colorHex: '#ec4899' },
+  { name: 'Amarillo', ring: '#ffcd00', colorHex: '#ffcd00' },
+  { name: 'Azul',     ring: '#0b3fae', colorHex: '#0b3fae' },
+  { name: 'Rojo',     ring: '#d8232a', colorHex: '#d8232a' },
+  { name: 'Verde',    ring: '#3aa655', colorHex: '#3aa655' },
 ];
+
+// Canica (SVG tricolor) con anillo del color del jugador.
+// `sizeClasses` son utilidades Tailwind de tamaño (ej. 'w-10 h-10').
+function marbleHTML(player, sizeClasses) {
+  const ring = (player && player.style && player.style.ring) || '#ffcd00';
+  const svg = (typeof svgMarble === 'function') ? svgMarble('') : '';
+  return `<span class="marble ${sizeClasses}" style="box-shadow:0 0 0 2px ${ring}, 0 4px 8px rgba(0,0,0,0.4); border-radius:50%;">${svg}</span>`;
+}
 
 // ---------- ESTADO ----------
 let gameState = {
@@ -139,17 +149,16 @@ function spawnFloatingMarbles(containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
   container.innerHTML = '';
-  const colors = ['#22c55e', '#14b8a6', '#eab308', '#ec4899', '#3b82f6', '#f97316'];
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < 10; i++) {
     const m = document.createElement('div');
-    const size = 18 + Math.random() * 46;
+    const size = 22 + Math.random() * 42;
     m.className = 'floating-marble';
     m.style.width = size + 'px';
     m.style.height = size + 'px';
     m.style.left = Math.random() * 100 + 'vw';
-    m.style.background = `radial-gradient(circle at 35% 35%, #fff, ${colors[i % colors.length]})`;
-    m.style.animationDuration = (8 + Math.random() * 10) + 's';
-    m.style.animationDelay = (Math.random() * 8) + 's';
+    m.style.animationDuration = (9 + Math.random() * 10) + 's';
+    m.style.animationDelay = (Math.random() * 9) + 's';
+    m.innerHTML = (typeof svgMarble === 'function') ? svgMarble('f' + i) : '';
     container.appendChild(m);
   }
 }
@@ -185,7 +194,105 @@ window.addEventListener('DOMContentLoaded', () => {
   document.body.addEventListener('pointerdown', unlockAudio);
   document.body.addEventListener('touchstart', unlockAudio);
   document.body.addEventListener('click', unlockAudio);
+
+  // Renderizar el título tricolor con canicas en las "O"
+  renderTitles();
+
+  // Restaurar nombre de usuario guardado (se comparte entre 1vsBOT y Online)
+  const savedName = localStorage.getItem('pqsy_name');
+  if (savedName) {
+    const localIn  = document.getElementById('localPlayerName');
+    const onlineIn = document.getElementById('onlineNickname');
+    if (localIn)  localIn.value = savedName;
+    if (onlineIn) onlineIn.value = savedName;
+  }
+  // Sincronizar el nombre entre ambos campos mientras se escribe + guardarlo
+  ['localPlayerName', 'onlineNickname'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', () => {
+      const v = el.value;
+      const other = document.getElementById(id === 'localPlayerName' ? 'onlineNickname' : 'localPlayerName');
+      if (other) other.value = v;
+      localStorage.setItem('pqsy_name', v);
+    });
+  });
+
+  // Activar "agitar para girar el dado" en móviles
+  setupShakeToRoll();
 });
+
+// ============================================================
+//  TÍTULO TRICOLOR (con canica incrustada en las "O")
+// ============================================================
+// Construye: ¿P[O]R QUÉ SIEMPRE Y[O]?  — rojo / azul / amarillo,
+// con una mini canica tricolor reemplazando cada "O".
+function titleHTML(marbleSize) {
+  const o = `<span class="title-o" style="width:${marbleSize};height:${marbleSize}">${(typeof svgMarble==='function')?svgMarble('t'+Math.random().toString(36).slice(2,6)):''}</span>`;
+  return `
+    <span class="title-wrap">
+      <span class="title-word tw-red">¿P${o}R</span>
+      <span class="title-word tw-red">QUÉ</span>
+      <span class="title-word tw-blue">SIEMPRE</span>
+      <span class="title-word tw-yellow">Y${o}?</span>
+    </span>`;
+}
+
+function renderTitles() {
+  document.querySelectorAll('[data-title]').forEach(el => {
+    const size = el.getAttribute('data-title-size') || '0.9em';
+    el.innerHTML = titleHTML(size);
+  });
+}
+
+// ============================================================
+//  AGITAR PARA GIRAR EL DADO (móvil) + vibración
+// ============================================================
+let shakeSetupDone = false;
+let lastShakeTime = 0;
+
+function handleMotion(e) {
+  const acc = e.accelerationIncludingGravity || e.acceleration;
+  if (!acc) return;
+  const total = Math.abs(acc.x || 0) + Math.abs(acc.y || 0) + Math.abs(acc.z || 0);
+  const now = Date.now();
+  // Umbral de agitón; con 1s de reposo para no disparar múltiples veces
+  if (total > 28 && now - lastShakeTime > 1000) {
+    lastShakeTime = now;
+    // Solo si es mi turno, no estoy girando y el juego está activo
+    if (document.getElementById('gameScreen') &&
+        !document.getElementById('gameScreen').classList.contains('hidden') &&
+        isMyTurnNow() && !gameState.isRolling && !gameState.isWaitingForHoleClick && !gameState.isGameOver) {
+      if (navigator.vibrate) navigator.vibrate(60);
+      handleRollDice();
+    }
+  }
+}
+
+function setupShakeToRoll() {
+  if (shakeSetupDone) return;
+  if (typeof DeviceMotionEvent === 'undefined') return; // no hay sensor (PC)
+  // En iOS 13+ hay que pedir permiso tras un gesto del usuario.
+  if (typeof DeviceMotionEvent.requestPermission === 'function') {
+    // Se solicitará al tocar el dado la primera vez (ver enableMotionIfNeeded)
+    return;
+  }
+  window.addEventListener('devicemotion', handleMotion);
+  shakeSetupDone = true;
+}
+
+// Pedir permiso de sensor en iOS al primer toque del dado
+function enableMotionIfNeeded() {
+  if (shakeSetupDone) return;
+  if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+    DeviceMotionEvent.requestPermission().then(state => {
+      if (state === 'granted') {
+        window.addEventListener('devicemotion', handleMotion);
+        shakeSetupDone = true;
+      }
+    }).catch(() => {});
+  }
+}
 
 // ============================================================
 //  CONFIGURACIÓN DE PANTALLA DE INICIO
@@ -198,13 +305,13 @@ function selectMode(mode) {
   const onlineCfg = document.getElementById('onlineConfig');
 
   if (mode === 'local') {
-    btnLocal.classList.add('ring-4', 'ring-amber-400');
-    btnOnline.classList.remove('ring-4', 'ring-amber-400');
+    btnLocal.classList.add('chip-active');
+    btnOnline.classList.remove('chip-active');
     localCfg.classList.remove('hidden');
     onlineCfg.classList.add('hidden');
   } else {
-    btnOnline.classList.add('ring-4', 'ring-amber-400');
-    btnLocal.classList.remove('ring-4', 'ring-amber-400');
+    btnOnline.classList.add('chip-active');
+    btnLocal.classList.remove('chip-active');
     onlineCfg.classList.remove('hidden');
     localCfg.classList.add('hidden');
   }
@@ -215,8 +322,7 @@ function setMarbleCount(count) {
   [4, 6, 8, 10].forEach(c => {
     const btn = document.getElementById(`mb${c}`);
     if (!btn) return;
-    btn.classList.toggle('ring-4', c === count);
-    btn.classList.toggle('ring-amber-400', c === count);
+    btn.classList.toggle('chip-active', c === count);
   });
 }
 
@@ -280,32 +386,31 @@ function renderPlayersPanel() {
   gameState.players.forEach((p, idx) => {
     const isCurrent = idx === gameState.currentTurnIndex;
     const card = document.createElement('div');
-    card.className = `flex-1 p-3 rounded-2xl border transition-all ${
-      isCurrent
-        ? 'bg-slate-800 border-amber-500/80 shadow-lg shadow-amber-500/10 scale-105'
-        : 'bg-slate-900/60 border-white/5 opacity-80'
+    card.className = `panel-card lift flex-1 p-3 rounded-2xl transition-all ${
+      isCurrent ? 'scale-105' : 'opacity-80'
     }`;
+    if (isCurrent) card.style.boxShadow = `0 0 0 2px ${p.style.ring}, 0 12px 26px -8px rgba(0,0,0,0.6)`;
 
     let marblesHtml = '';
     for (let m = 0; m < p.marbles; m++) {
-      marblesHtml += `<div class="w-4 h-4 rounded-full ${p.style.class} inline-block shadow-sm"></div>`;
+      marblesHtml += marbleHTML(p, 'w-4 h-4');
     }
 
     card.innerHTML = `
       <div class="flex items-center justify-between mb-2">
         <div class="flex items-center gap-2">
-          <div class="w-5 h-5 rounded-full ${p.style.class}"></div>
+          ${marbleHTML(p, 'w-5 h-5')}
           <span class="font-display text-base text-white truncate max-w-[110px]">${p.name}</span>
-          ${p.isBot ? '<span class="text-xs bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-sans">BOT</span>' : ''}
+          ${p.isBot ? '<span class="text-xs px-2 py-0.5 rounded font-sans text-white" style="background:rgba(216,35,42,0.3)">BOT</span>' : ''}
         </div>
-        ${isCurrent ? '<span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>' : ''}
+        ${isCurrent ? `<span class="w-2.5 h-2.5 rounded-full animate-ping" style="background:${p.style.ring}"></span>` : ''}
       </div>
       <div class="flex flex-col gap-1">
-        <div class="flex items-center justify-between text-sm text-slate-300 font-sans">
+        <div class="flex items-center text-sm font-sans" style="color:#e9d9b6">
           <span>Canicas: <strong class="text-white">${p.marbles}</strong></span>
         </div>
         <div class="flex flex-wrap gap-1 items-center min-h-[20px]">
-          ${p.marbles === 0 ? '<span class="text-sm font-bold text-emerald-400">¡Sin canicas! 🎉</span>' : marblesHtml}
+          ${p.marbles === 0 ? '<span class="text-sm font-bold" style="color:#ffcd00">¡Sin canicas! 🎉</span>' : marblesHtml}
         </div>
       </div>
     `;
@@ -327,9 +432,7 @@ function renderBoardHoles() {
 
     const occupant = gameState.boardHoles[h];
     if (occupant) {
-      const marbleDiv = document.createElement('div');
-      marbleDiv.className = `w-10 h-10 sm:w-11 sm:h-11 marble ${occupant.style.class}`;
-      holeEl.appendChild(marbleDiv);
+      holeEl.innerHTML = marbleHTML(occupant, 'w-9 h-9 sm:w-11 sm:h-11');
     }
   }
 
@@ -354,26 +457,34 @@ function updateTurnUI() {
 
   const nameEl = document.getElementById('turnPlayerName');
   const dotEl  = document.getElementById('turnMarbleDot');
-  const btnRoll = document.getElementById('btnRoll');
   const btnPass = document.getElementById('btnPass');
+  const dice    = document.getElementById('dice3d');
+  const hint    = document.getElementById('diceHint');
 
   if (nameEl) nameEl.innerText = curPlayer.name;
-  if (dotEl)  dotEl.className = `w-6 h-6 rounded-full ${curPlayer.style.class}`;
+  if (dotEl)  dotEl.innerHTML = marbleHTML(curPlayer, 'w-7 h-7');
 
   const isMyTurn = isMyTurnNow();
+  const canRoll  = isMyTurn && !gameState.isRolling && !gameState.isWaitingForHoleClick && !curPlayer.isBot && !gameState.isGameOver;
 
-  if (btnRoll) {
-    btnRoll.disabled = !isMyTurn || gameState.isRolling || gameState.isWaitingForHoleClick || curPlayer.isBot || gameState.isGameOver;
-    btnRoll.className = btnRoll.disabled
-      ? "w-full py-4 rounded-2xl bg-slate-800 text-slate-500 font-display font-extrabold text-xl opacity-50 cursor-not-allowed flex items-center justify-center gap-2"
-      : "w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-display font-extrabold text-xl shadow-lg shadow-amber-500/25 active:scale-95 transition-all flex items-center justify-center gap-2";
+  // El dado es el "botón": clicable solo cuando puedo lanzar
+  if (dice) {
+    dice.style.pointerEvents = canRoll ? 'auto' : 'none';
+    dice.style.opacity = canRoll ? '1' : '0.6';
+  }
+  if (hint) {
+    if (gameState.isGameOver) hint.innerText = '';
+    else if (curPlayer.isBot) hint.innerText = `Turno de ${curPlayer.name}…`;
+    else if (!isMyTurn) hint.innerText = `Turno de ${curPlayer.name}`;
+    else if (gameState.isWaitingForHoleClick) hint.innerText = '';
+    else hint.innerHTML = 'Toca el dado <span style="opacity:.7">(o agita el cel)</span>';
   }
 
   if (btnPass) {
     btnPass.disabled = !isMyTurn || !gameState.hasPlacedThisTurn || gameState.isRolling || gameState.isWaitingForHoleClick || curPlayer.isBot || gameState.isGameOver;
     btnPass.className = btnPass.disabled
-      ? "w-full py-3 rounded-2xl bg-slate-800 text-slate-500 font-sans font-bold text-base border border-white/5 opacity-50 cursor-not-allowed flex items-center justify-center gap-2"
-      : "w-full py-3 rounded-2xl bg-amber-600 hover:bg-amber-500 text-white font-sans font-bold text-base shadow-md transition-all flex items-center justify-center gap-2";
+      ? "btn-secondary w-full py-3 rounded-2xl font-sans font-bold text-base opacity-40 cursor-not-allowed flex items-center justify-center gap-2"
+      : "btn-secondary lift w-full py-3 rounded-2xl font-sans font-bold text-base flex items-center justify-center gap-2";
   }
 }
 
@@ -382,12 +493,12 @@ function logAction(msg) {
   if (logEl) logEl.innerText = msg;
 }
 
-function setBoardTheme(themeClass) {
-  gameState.boardTheme = themeClass;
-  const board = document.getElementById('boardSurface');
-  if (board) {
-    board.className = `w-full h-full rounded-2xl ${themeClass} relative p-4 flex flex-col justify-between overflow-hidden shadow-inner`;
-  }
+function setBoardTheme() { /* El tablero colombiano es único; función conservada por compatibilidad. */ }
+
+// Clic/toque del dado = lanzar (reemplaza al botón). Pide permiso de sensor en iOS.
+function handleDiceTap() {
+  enableMotionIfNeeded();
+  handleRollDice();
 }
 
 // ============================================================
@@ -495,7 +606,7 @@ function executeTurnResult(diceVal) {
     animateMarbleIntoSix(curPlayer);
     playMarbleSound();
     if (gameState.gameType === 'online' && gameState.isHost) {
-      broadcastToGuests({ type: 'FX_MARBLE_SIX', styleClass: curPlayer.style.class });
+      broadcastToGuests({ type: 'FX_MARBLE_SIX', ring: curPlayer.style.ring });
     }
     logAction(`¡Excelente! La canica cayó en el hoyo 6 🎁 (Quedan: ${curPlayer.marbles})`);
 
@@ -545,7 +656,8 @@ function animateMarbleIntoSix(player) {
   const pit = document.getElementById('pitMarbles');
   if (!pit) return;
   const m = document.createElement('div');
-  m.className = `w-8 h-8 marble ${player.style.class} animate-drop-six`;
+  m.className = 'w-9 h-9 animate-drop-six';
+  m.innerHTML = marbleHTML(player, 'w-9 h-9');
   pit.appendChild(m);
   setTimeout(() => { if (m.parentNode) m.parentNode.removeChild(m); }, 750);
 }
@@ -982,7 +1094,7 @@ function handleIncomingNetworkData(conn, data) {
         break;
       case 'FX_MARBLE_SIX':
         playMarbleSound();
-        animateMarbleIntoSix({ style: { class: data.styleClass || 'marble-green' } });
+        animateMarbleIntoSix({ style: { ring: data.ring || '#ffcd00' } });
         break;
       case 'FX_PENALTY':
         playErrorSound();

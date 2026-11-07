@@ -1,97 +1,166 @@
 /* ============================================================
-   ¿POR QUÉ SIEMPRE YO? — Estilos del juego
+   ¿POR QUÉ SIEMPRE YO? — Estética Colombiana 🇨🇴
+   Madera + verde oliva tallado + tricolor (amarillo/azul/rojo)
    ============================================================ */
 
-/* 3D Wood Box Frame */
+:root {
+  --col-yellow: #ffcd00;
+  --col-blue:   #0b3fae;
+  --col-red:    #d8232a;
+  --wood-dark:  #3a2416;
+  --wood:       #5a3a22;
+  --wood-light: #7a4e2e;
+  --olive:      #9aa05a;
+  --olive-dark: #7f864a;
+  --cream:      #f3ead6;
+}
+
+/* Fondo general tipo madera con textura de puntitos (como el mockup) */
+body, .screen-overlay, #gameScreen {
+  background-color: #2a1a10;
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.04) 1.3px, transparent 1.3px),
+    radial-gradient(circle at 15% 15%, rgba(255, 205, 0, 0.06), transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(11, 63, 174, 0.06), transparent 45%),
+    linear-gradient(160deg, #3a2416, #241209 70%);
+  background-size: 22px 22px, 100% 100%, 100% 100%, 100% 100%;
+}
+
+/* ============================================================
+   TABLERO DE MADERA TALLADA (marco) + superficie verde oliva
+   ============================================================ */
 .wood-frame {
-  background: linear-gradient(145deg, #78350f, #451a03);
+  background:
+    repeating-linear-gradient(92deg, rgba(0,0,0,0.05) 0 3px, transparent 3px 9px),
+    linear-gradient(145deg, var(--wood-light), var(--wood) 45%, var(--wood-dark));
   box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.7),
-    inset 0 4px 8px rgba(255, 255, 255, 0.25),
-    inset 0 -6px 12px rgba(0, 0, 0, 0.8),
-    0 10px 0 #290e02;
-  border: 14px solid #542207;
-  border-radius: 28px;
+    inset 0 4px 10px rgba(255, 220, 170, 0.25),
+    inset 0 -8px 16px rgba(0, 0, 0, 0.8),
+    0 10px 0 #1c0f06;
+  border: 16px solid transparent;
+  border-image: linear-gradient(135deg, #8a5a32, #4a2c17) 1;
+  border-radius: 22px;
+  position: relative;
 }
 
-/* Inner Board Surface Themes */
-.board-blue   { background: radial-gradient(circle at center, #38bdf8, #0284c7, #0369a1); }
-.board-purple { background: radial-gradient(circle at center, #c084fc, #9333ea, #581c87); }
-.board-green  { background: radial-gradient(circle at center, #4ade80, #16a34a, #14532d); }
-.board-orange { background: radial-gradient(circle at center, #fb923c, #ea580c, #7c2d12); }
-.board-teal   { background: radial-gradient(circle at center, #2dd4bf, #0d9488, #115e59); }
+/* Hojas talladas en las esquinas del marco */
+.wood-frame .carved-leaf {
+  position: absolute;
+  width: 34px; height: 34px;
+  opacity: 0.8;
+  pointer-events: none;
+}
+.wood-frame .carved-leaf.tl { top: -11px;  left: 14px; }
+.wood-frame .carved-leaf.tr { top: -11px;  right: 14px; transform: scaleX(-1); }
+.wood-frame .carved-leaf.bl { bottom: -11px; left: 14px; transform: scaleY(-1); }
+.wood-frame .carved-leaf.br { bottom: -11px; right: 14px; transform: scale(-1); }
 
-/* Holes (Inset 3D Effect) */
+/* Superficie interior: verde oliva pintado a mano (única, sin temas) */
+.board-surface {
+  background:
+    radial-gradient(circle at 50% 46%, rgba(0,0,0,0.12), transparent 55%),
+    linear-gradient(160deg, #a7ad63, var(--olive) 55%, var(--olive-dark));
+  box-shadow: inset 0 0 40px rgba(60, 50, 10, 0.35);
+}
+
+/* Flores pintadas suaves de fondo (decorativas) */
+.board-surface::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 30% 60%, rgba(216,35,42,0.10), transparent 12%),
+    radial-gradient(circle at 70% 62%, rgba(11,63,174,0.10), transparent 12%),
+    radial-gradient(circle at 42% 80%, rgba(255,205,0,0.12), transparent 12%);
+  pointer-events: none;
+}
+
+/* Stickers (parches recortados) pegados en la superficie */
+.sticker {
+  position: absolute;
+  filter: drop-shadow(0 3px 3px rgba(0,0,0,0.35));
+  pointer-events: none;
+  z-index: 4;
+}
+.sticker svg { width: 100%; height: 100%; display: block; }
+.sticker-chiva    { width: 23%; top: 7%;  left: 6%;  transform: rotate(-6deg); }
+.sticker-sombrero { width: 22%; top: 8%;  right: 5%; transform: rotate(5deg); }
+.sticker-placa    { width: 24%; bottom: 6%; left: 6%; }
+.sticker-canasta  { width: 18%; bottom: 5%; right: 7%; }
+
+/* ============================================================
+   HOYOS (madera perforada)
+   ============================================================ */
 .hole-socket {
-  background: radial-gradient(circle at center, #0f172a 40%, #1e293b 80%, #334155 100%);
+  background:
+    radial-gradient(circle at 50% 38%, #3a2414 35%, #2a1a0e 70%, #1c1008 100%);
   box-shadow:
-    inset 0 6px 10px rgba(0, 0, 0, 0.9),
-    inset 0 -2px 4px rgba(255, 255, 255, 0.2),
-    0 2px 4px rgba(255, 255, 255, 0.3);
+    inset 0 7px 12px rgba(0, 0, 0, 0.95),
+    inset 0 -3px 5px rgba(140, 95, 55, 0.5),
+    0 2px 3px rgba(255, 220, 170, 0.35);
   cursor: pointer;
 }
 
-/* Center Big 6 Hole Deep Pit */
 .hole-six-pit {
-  background: radial-gradient(circle at center, #000000 50%, #090d16 85%, #1e293b 100%);
+  background:
+    radial-gradient(circle at 50% 40%, #2a1a0e 45%, #180d06 80%, #0d0703 100%);
   box-shadow:
-    inset 0 12px 24px rgba(0, 0, 0, 0.95),
-    inset 0 -4px 8px rgba(255, 255, 255, 0.15),
-    0 4px 8px rgba(255, 255, 255, 0.4);
+    inset 0 14px 26px rgba(0, 0, 0, 0.95),
+    inset 0 -4px 8px rgba(140, 95, 55, 0.4),
+    0 4px 8px rgba(255, 220, 170, 0.4);
   cursor: pointer;
 }
 
-/* Target Hole Pulse Highlight when waiting for manual input */
+/* Resaltado del hoyo objetivo al lanzar el dado (tricolor) */
 .hole-waiting-input {
-  animation: socketPulse 1s infinite alternate ease-in-out;
-  border: 3px solid #f59e0b !important;
+  animation: socketPulse 0.9s infinite alternate ease-in-out;
   cursor: pointer !important;
 }
 
 @keyframes socketPulse {
-  0%   { transform: scale(1);    box-shadow: 0 0 5px #f59e0b; }
-  100% { transform: scale(1.12); box-shadow: 0 0 25px #fbbf24; }
+  0%   { box-shadow: inset 0 7px 12px rgba(0,0,0,0.9), 0 0 6px 2px var(--col-yellow); transform: scale(1); }
+  100% { box-shadow: inset 0 7px 12px rgba(0,0,0,0.9), 0 0 26px 8px var(--col-red);    transform: scale(1.1); }
 }
 
-/* Glass Marble Texture */
+/* ============================================================
+   CANICAS — SVG tricolor de cristal
+   ============================================================ */
 .marble {
   border-radius: 50%;
   position: relative;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
 }
+.marble-svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.45)); }
 
-.marble::after {
-  content: '';
-  position: absolute;
-  top: 12%;
-  left: 18%;
-  width: 35%;
-  height: 35%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 70%);
-  pointer-events: none;
-}
+/* Puntos de color (en tarjetas de jugador y dot de turno) usan la canica mini */
+.marble-dot { display: inline-flex; align-items: center; justify-content: center; }
+.marble-dot svg { width: 100%; height: 100%; }
 
-/* Marble Color Variants */
-.marble-green   { background: radial-gradient(circle at 35% 35%, #86efac, #22c55e, #14532d); box-shadow: 0 6px 12px rgba(0,0,0,0.4), inset 0 -4px 8px rgba(0,0,0,0.5), inset 0 4px 6px rgba(255,255,255,0.6); }
-.marble-teal    { background: radial-gradient(circle at 35% 35%, #99f6e4, #14b8a6, #0f766e); box-shadow: 0 6px 12px rgba(0,0,0,0.4), inset 0 -4px 8px rgba(0,0,0,0.5), inset 0 4px 6px rgba(255,255,255,0.6); }
-.marble-amber   { background: radial-gradient(circle at 35% 35%, #fde047, #eab308, #713f12); box-shadow: 0 6px 12px rgba(0,0,0,0.4), inset 0 -4px 8px rgba(0,0,0,0.5), inset 0 4px 6px rgba(255,255,255,0.6); }
-.marble-magenta { background: radial-gradient(circle at 35% 35%, #f472b6, #ec4899, #831843); box-shadow: 0 6px 12px rgba(0,0,0,0.4), inset 0 -4px 8px rgba(0,0,0,0.5), inset 0 4px 6px rgba(255,255,255,0.6); }
-.marble-blue    { background: radial-gradient(circle at 35% 35%, #60a5fa, #3b82f6, #1e3a8a); box-shadow: 0 6px 12px rgba(0,0,0,0.4), inset 0 -4px 8px rgba(0,0,0,0.5), inset 0 4px 6px rgba(255,255,255,0.6); }
-
-/* 3D Rolling Dice */
+/* ============================================================
+   DADO (madera clara con puntos tallados)
+   ============================================================ */
 .dice-3d {
-  width: 72px;
-  height: 72px;
-  background: radial-gradient(circle at 30% 30%, #ffffff, #e2e8f0, #cbd5e1);
+  width: 80px;
+  height: 80px;
+  background:
+    repeating-linear-gradient(48deg, rgba(0,0,0,0.04) 0 2px, transparent 2px 7px),
+    radial-gradient(circle at 30% 28%, #f6e7c8, #e4cfa0 60%, #caa877);
+  background-color: #ecd9b4;
   border-radius: 16px;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.3), inset 0 -4px 6px rgba(0,0,0,0.2), inset 0 4px 6px #ffffff;
+  box-shadow: 0 12px 22px rgba(0,0,0,0.4), inset 0 -5px 7px rgba(120,80,40,0.35), inset 0 5px 7px rgba(255,248,230,0.8);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform 0.25s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  user-select: none;
 }
-
+.dice-3d:hover { transform: translateY(-4px) rotate(-3deg); box-shadow: 0 18px 28px rgba(0,0,0,0.45), inset 0 -5px 7px rgba(120,80,40,0.35), inset 0 5px 7px rgba(255,248,230,0.9); }
+.dice-3d:active { transform: translateY(2px) scale(0.96); }
 .dice-rolling { animation: rollAnimation 0.6s ease-out; }
 
 @keyframes rollAnimation {
@@ -101,10 +170,14 @@
   100% { transform: rotate(540deg) scale(1);   }
 }
 
-/* Curved Title */
-.curved-title {
-  font-family: 'Righteous', cursive;
-  text-shadow: 2px 4px 0px rgba(0,0,0,0.6), 0 0 12px rgba(255,255,255,0.4);
+#diceValue { color: var(--col-blue); font-weight: 700; }
+
+/* Pista sobre el dado (reemplaza al botón) */
+.dice-hint {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem;
+  color: #e9d9b6;
+  opacity: 0.85;
 }
 
 /* Drop into hole 6 */
@@ -113,150 +186,184 @@
   50%  { transform: scale(0.6) translateY(10px); opacity: 0.8; }
   100% { transform: scale(0)   translateY(25px); opacity: 0; }
 }
-
 .animate-drop-six { animation: dropIntoSix 0.7s ease-in forwards; }
 
 /* ============================================================
-   PANTALLAS (Inicio / Fin) — full screen overlays
+   TÍTULO TRICOLOR + canica en las "O"
+   ============================================================ */
+.title-wrap { display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.1em; line-height: 1; }
+.title-word { font-family: 'Righteous', cursive; text-shadow: 2px 4px 0 rgba(0,0,0,0.45); }
+.tw-red    { color: var(--col-red); }
+.tw-blue   { color: var(--col-blue); }
+.tw-yellow { color: var(--col-yellow); }
+/* Canica incrustada en la letra O */
+.title-o { display: inline-block; vertical-align: middle; position: relative; }
+.title-o svg { display: block; }
+
+/* ============================================================
+   PANTALLAS (overlays)
    ============================================================ */
 .screen-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   z-index: 60;
-  /* Altura real del viewport, con fallbacks para iOS Safari */
   height: 100vh;
   height: -webkit-fill-available;
   height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* Centra el contenido cuando cabe, pero permite scroll si es más alto que la pantalla */
   justify-content: safe center;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  /* Padding con safe-area para notch/barra inferior de iPhone */
-  padding: calc(2rem + env(safe-area-inset-top)) 1.5rem calc(3rem + env(safe-area-inset-bottom));
-  background:
-    radial-gradient(circle at 20% 20%, rgba(251, 191, 36, 0.12), transparent 40%),
-    radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.12), transparent 40%),
-    linear-gradient(160deg, #1e1b4b, #020617 60%);
+  padding: calc(1.5rem + env(safe-area-inset-top)) 1.25rem calc(2rem + env(safe-area-inset-bottom));
 }
-
-/* El contenido interno nunca queda pegado a los bordes al hacer scroll.
-   Usamos padding en el eje vertical (no margin:auto) para que, cuando el
-   contenido excede la altura, TODO quede dentro del área scrolleable. */
-.screen-overlay > .relative {
-  margin: auto 0;
-  flex-shrink: 0;
-}
-
+.screen-overlay > .relative { margin: auto 0; flex-shrink: 0; }
 .screen-overlay.hidden { display: none; }
 
-/* Floating marbles decoration */
-.floating-marble {
-  position: absolute;
-  border-radius: 50%;
-  opacity: 0.35;
-  filter: blur(1px);
-  animation: floatUp linear infinite;
-  pointer-events: none;
+/* Tarjeta de panel reutilizable (madera clara translúcida) */
+.panel-card {
+  background: linear-gradient(160deg, rgba(90,58,34,0.92), rgba(58,36,22,0.92));
+  border: 1px solid rgba(255, 220, 170, 0.18);
+  box-shadow: 0 12px 30px -8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,220,170,0.15);
 }
 
+/* ============================================================
+   INTERACTIVIDAD — hover lift global (estilo "Para Nice")
+   ============================================================ */
+.lift { transition: transform 0.18s cubic-bezier(0.34,1.4,0.64,1), box-shadow 0.18s ease, filter 0.18s ease; }
+@media (hover: hover) {
+  .lift:hover { transform: translateY(-4px) scale(1.03); filter: brightness(1.06); }
+  .lift:active { transform: translateY(0) scale(0.98); }
+}
+
+/* Canicas flotantes decorativas */
+.floating-marble { position: absolute; opacity: 0.4; animation: floatUp linear infinite; pointer-events: none; }
+.floating-marble svg { width: 100%; height: 100%; }
 @keyframes floatUp {
-  0%   { transform: translateY(20vh) scale(0.8); opacity: 0; }
-  10%  { opacity: 0.4; }
-  90%  { opacity: 0.4; }
-  100% { transform: translateY(-110vh) scale(1.1); opacity: 0; }
+  0%   { transform: translateY(20vh) scale(0.8) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.45; }
+  90%  { opacity: 0.45; }
+  100% { transform: translateY(-110vh) scale(1.1) rotate(220deg); opacity: 0; }
 }
 
-/* ====== DERROTA: lágrimas cayendo + emoji tembloroso ====== */
+/* ====== DERROTA: lágrimas + emoji tembloroso ====== */
 .tear-drop {
-  position: absolute;
-  top: -40px;
-  width: 12px;
-  height: 18px;
-  /* Forma de gota: redonda abajo, puntuda arriba */
+  position: absolute; top: -40px; width: 12px; height: 18px;
   border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
   background: linear-gradient(180deg, #bae6fd, #38bdf8 60%, #0284c7);
   box-shadow: inset 0 -2px 3px rgba(255,255,255,0.5), 0 2px 4px rgba(2,132,199,0.4);
-  opacity: 0.85;
-  animation: tearFall linear forwards;
-  pointer-events: none;
+  opacity: 0.85; animation: tearFall linear forwards; pointer-events: none;
 }
-
 @keyframes tearFall {
-  0%   { transform: translateY(0)      rotate(180deg); opacity: 0; }
+  0%   { transform: translateY(0)     rotate(180deg); opacity: 0; }
   10%  { opacity: 0.9; }
-  100% { transform: translateY(110vh)  rotate(180deg); opacity: 0.2; }
+  100% { transform: translateY(110vh) rotate(180deg); opacity: 0.2; }
 }
-
 .sad-shake { animation: sadShake 1.4s ease-in-out infinite; }
-
 @keyframes sadShake {
-  0%, 100% { transform: translateY(0)    rotate(-4deg); }
-  25%      { transform: translateY(2px)  rotate(3deg);  }
-  50%      { transform: translateY(-2px) rotate(-3deg); }
-  75%      { transform: translateY(2px)  rotate(4deg);  }
+  0%,100% { transform: translateY(0)   rotate(-4deg); }
+  25%     { transform: translateY(2px) rotate(3deg); }
+  50%     { transform: translateY(-2px) rotate(-3deg); }
+  75%     { transform: translateY(2px) rotate(4deg); }
 }
 
-/* Big pulsing title on start screen */
-.mega-title {
-  font-family: 'Righteous', cursive;
-  line-height: 1.05;
-  text-shadow: 3px 6px 0 rgba(0,0,0,0.55), 0 0 25px rgba(251,191,36,0.45);
-  animation: titleBreath 3s ease-in-out infinite;
-}
+/* Título grande con latido */
+.mega-title { font-family:'Righteous',cursive; line-height:1.05; animation: titleBreath 3.2s ease-in-out infinite; }
+@keyframes titleBreath { 0%,100%{transform:scale(1) rotate(-1deg);} 50%{transform:scale(1.03) rotate(1deg);} }
 
-@keyframes titleBreath {
-  0%, 100% { transform: scale(1)    rotate(-1deg); }
-  50%      { transform: scale(1.03) rotate(1deg);  }
-}
-
-/* Winner trophy bounce */
 .trophy-bounce { animation: trophyBounce 1.2s ease-in-out infinite; }
+@keyframes trophyBounce { 0%,100%{transform:translateY(0) rotate(-5deg);} 50%{transform:translateY(-18px) rotate(5deg);} }
 
-@keyframes trophyBounce {
-  0%, 100% { transform: translateY(0)     rotate(-5deg); }
-  50%      { transform: translateY(-18px) rotate(5deg);  }
-}
-
-/* Primary pill button */
+/* ============================================================
+   BOTONES
+   ============================================================ */
 .btn-primary {
-  background: linear-gradient(90deg, #f59e0b, #f97316);
-  color: #0f172a;
+  background: linear-gradient(90deg, var(--col-yellow), #f2a900);
+  color: #3a2416;
   font-family: 'Righteous', cursive;
-  box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.5), 0 4px 0 #b45309;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 10px 22px -5px rgba(242,169,0,0.5), 0 4px 0 #9a6b00;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
 }
-.btn-primary:hover  { transform: translateY(-2px); box-shadow: 0 14px 30px -5px rgba(245,158,11,0.6), 0 6px 0 #b45309; }
-.btn-primary:active { transform: translateY(2px);  box-shadow: 0 6px 15px -5px rgba(245,158,11,0.5), 0 2px 0 #b45309; }
+.btn-primary:hover  { transform: translateY(-3px); filter: brightness(1.05); box-shadow: 0 16px 30px -5px rgba(242,169,0,0.6), 0 6px 0 #9a6b00; }
+.btn-primary:active { transform: translateY(2px);  box-shadow: 0 6px 14px -5px rgba(242,169,0,0.5), 0 2px 0 #9a6b00; }
+
+.btn-blue { background: linear-gradient(90deg, #2155c9, var(--col-blue)); color:#fff; box-shadow: 0 10px 22px -5px rgba(11,63,174,0.5), 0 4px 0 #082a78; }
+.btn-blue:hover { transform: translateY(-3px); filter: brightness(1.08); }
+.btn-red  { background: linear-gradient(90deg, #e2454c, var(--col-red)); color:#fff; box-shadow: 0 10px 22px -5px rgba(216,35,42,0.5), 0 4px 0 #8f1418; }
+.btn-red:hover { transform: translateY(-3px); filter: brightness(1.08); }
 
 .btn-secondary {
-  background: rgba(30, 41, 59, 0.9);
-  color: #e2e8f0;
-  border: 2px solid rgba(255,255,255,0.12);
+  background: rgba(58,36,22,0.9);
+  color: var(--cream);
+  border: 2px solid rgba(255,220,170,0.18);
   font-family: 'Outfit', sans-serif;
   transition: all 0.15s ease;
 }
-.btn-secondary:hover { background: rgba(51, 65, 85, 0.95); }
+.btn-secondary:hover { background: rgba(90,58,34,0.95); transform: translateY(-2px); }
 
-/* Waiting spinner dots */
-.wait-dot {
-  width: 12px; height: 12px; border-radius: 50%;
-  background: #fbbf24;
-  animation: waitBlink 1.2s infinite ease-in-out both;
+/* Inputs */
+.col-input {
+  background: rgba(36,22,12,0.85);
+  border: 2px solid rgba(255,220,170,0.2);
+  color: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
+.col-input:focus { outline: none; border-color: var(--col-yellow); box-shadow: 0 0 0 3px rgba(255,205,0,0.25); }
+
+/* Chips de selección (modo, canicas) */
+.chip { background: rgba(36,22,12,0.7); border: 2px solid rgba(255,220,170,0.15); transition: all 0.15s ease; color: var(--cream); }
+.chip:hover { transform: translateY(-2px); border-color: rgba(255,205,0,0.5); }
+.chip.chip-active { border-color: var(--col-yellow); box-shadow: 0 0 0 3px rgba(255,205,0,0.3); background: rgba(242,169,0,0.18); }
+
+.wait-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--col-yellow); animation: waitBlink 1.2s infinite ease-in-out both; }
 .wait-dot:nth-child(2) { animation-delay: 0.2s; }
 .wait-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes waitBlink { 0%,80%,100%{transform:scale(0.6);opacity:0.4;} 40%{transform:scale(1);opacity:1;} }
 
-@keyframes waitBlink {
-  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-  40%           { transform: scale(1);   opacity: 1;   }
+/* ============================================================
+   MÓVIL — compactar para que TODO entre sin scroll
+   ============================================================ */
+@media (max-width: 860px) {
+  .dice-3d { width: 60px; height: 60px; }
 }
 
-/* Mobile tweaks: keep board usable on small screens */
-@media (max-width: 640px) {
-  .dice-3d { width: 64px; height: 64px; }
+@media (max-width: 760px) {
+  /* El juego ocupa exactamente la altura de la pantalla, sin scroll */
+  #gameScreen { height: 100vh; height: 100dvh; overflow: hidden; }
+  #gameScreen main {
+    gap: 0.4rem;
+    padding: 0.4rem 0.5rem calc(0.4rem + env(safe-area-inset-bottom));
+    justify-content: flex-start;
+  }
+
+  /* Jugadores arriba, compactos y en fila */
+  #playersPanel { gap: 0.4rem; order: 1 !important; width: 100%; }
+  #playersPanel .panel-card { padding: 0.5rem 0.6rem; }
+  /* En móvil ocultamos la lista de canicas (dejamos solo el número) para ahorrar alto */
+  #playersPanel .panel-card .flex-wrap { display: none; }
+
+  /* Tablero: que no sea tan alto; limitado por el espacio disponible */
+  #gameScreen main > div:nth-child(2) { order: 2 !important; max-width: min(78vw, 46vh); }
+
+  /* Panel de turno + dado compacto abajo, en fila */
+  #gameScreen main > div:nth-child(3) {
+    order: 3 !important;
+    flex-direction: row;
+    gap: 0.6rem;
+    padding: 0.6rem 0.8rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+  #gameScreen main > div:nth-child(3) > * { margin: 0; }
+  #turnIndicator { padding: 0.4rem 0.6rem; }
+  #actionLog { display: none; }         /* el log ocupa mucho; en móvil usamos solo la pista */
+  #btnPass { width: auto; padding: 0.6rem 1rem; }
+  .dice-3d { width: 56px; height: 56px; }
+}
+
+/* Pantallas muy bajas (celulares pequeños / apaisado) */
+@media (max-height: 700px) and (max-width: 760px) {
+  .dice-3d { width: 50px; height: 50px; }
+  #gameScreen main > div:nth-child(2) { max-width: min(62vw, 40vh); }
 }

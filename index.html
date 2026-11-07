@@ -3,53 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>¿Por Qué Siempre Yo? — Juego de Mesa</title>
-  <meta name="description" content="El clásico juego de mesa 'Caja 6'. Juega contra el BOT o en línea con tus amigos. ¡El primero en quedarse sin canicas gana!">
-  <meta name="theme-color" content="#f59e0b">
+  <title>¿Por Qué Siempre Yo? — Juego de Mesa Colombiano</title>
+  <meta name="description" content="El clásico juego de mesa 'Caja 6' con sabor colombiano. Juega contra el BOT o en línea con tus amigos.">
+  <meta name="theme-color" content="#5a3a22">
 
-  <!-- Open Graph -->
   <meta property="og:title" content="¿Por Qué Siempre Yo? — Juego de Mesa">
-  <meta property="og:description" content="El clásico juego de mesa 'Caja 6'. Juega contra el BOT o en línea con tus amigos.">
+  <meta property="og:description" content="El clásico juego de mesa 'Caja 6' con sabor colombiano.">
   <meta property="og:type" content="website">
 
-  <!-- Favicon (emoji dado) -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎲</text></svg>">
+  <!-- Favicon: canica tricolor -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%23eaf6ff'/><path d='M60 14 C30 32 66 52 36 74' stroke='%23ffcd00' stroke-width='9' fill='none'/><path d='M56 16 C28 34 62 52 32 74' stroke='%230b3fae' stroke-width='7' fill='none'/><path d='M52 18 C26 36 58 52 30 72' stroke='%23d8232a' stroke-width='5' fill='none'/></svg>">
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Fuentes -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Outfit:wght@400;600;800&family=Righteous&display=swap" rel="stylesheet">
 
-  <!-- Iconos -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <!-- Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
-  <!-- PeerJS (multijugador online) -->
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
-  <!-- Estilos propios -->
   <link rel="stylesheet" href="style.css">
 
   <script>
     tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            display: ['Righteous', 'cursive'],
-            game: ['Fredoka', 'sans-serif'],
-            sans: ['Outfit', 'sans-serif'],
-          }
-        }
-      }
+      theme: { extend: { fontFamily: {
+        display: ['Righteous', 'cursive'],
+        game: ['Fredoka', 'sans-serif'],
+        sans: ['Outfit', 'sans-serif'],
+      } } }
     }
   </script>
 </head>
-<body class="bg-slate-950 text-white min-h-screen font-game select-none overflow-x-hidden">
+<body class="text-white min-h-screen font-game select-none overflow-x-hidden">
 
   <!-- ============================================================
        PANTALLA DE INICIO
@@ -57,82 +44,74 @@
   <div id="startScreen" class="screen-overlay">
     <div id="startFloaties" class="absolute inset-0 overflow-hidden"></div>
 
-    <div class="relative z-10 w-full max-w-lg text-center flex flex-col items-center gap-8">
-      <div class="flex items-center justify-center gap-3 text-amber-400 text-6xl trophy-bounce">
-        <i class="fa-solid fa-dice"></i>
-      </div>
+    <div class="relative z-10 w-full max-w-md text-center flex flex-col items-center gap-5">
 
-      <h1 class="mega-title text-5xl sm:text-6xl text-amber-400">
-        ¿POR QUÉ<br><span class="text-pink-400">SIEMPRE YO?</span>
-      </h1>
-      <p class="text-slate-300 font-sans text-lg -mt-4">El clásico juego de mesa «Caja 6»</p>
+      <h1 class="mega-title text-4xl sm:text-5xl" data-title data-title-size="0.85em"></h1>
 
       <!-- Selección de modo -->
       <div class="w-full grid grid-cols-2 gap-3">
-        <button id="modeLocalBtn" onclick="selectMode('local')" class="ring-4 ring-amber-400 py-5 rounded-2xl bg-slate-800/90 border border-white/10 flex flex-col items-center gap-2 transition-all hover:bg-slate-700/90">
-          <i class="fa-solid fa-robot text-3xl text-amber-400"></i>
+        <button id="modeLocalBtn" onclick="selectMode('local')" class="chip chip-active lift py-5 rounded-2xl flex flex-col items-center gap-2">
+          <i class="fa-solid fa-robot text-3xl" style="color:var(--col-yellow)"></i>
           <span class="font-display text-lg">1 vs BOT</span>
         </button>
-        <button id="modeOnlineBtn" onclick="selectMode('online')" class="py-5 rounded-2xl bg-slate-800/90 border border-white/10 flex flex-col items-center gap-2 transition-all hover:bg-slate-700/90">
-          <i class="fa-solid fa-globe text-3xl text-sky-400"></i>
+        <button id="modeOnlineBtn" onclick="selectMode('online')" class="chip lift py-5 rounded-2xl flex flex-col items-center gap-2">
+          <i class="fa-solid fa-globe text-3xl" style="color:var(--col-blue)"></i>
           <span class="font-display text-lg">Online</span>
         </button>
       </div>
 
       <!-- Config LOCAL -->
-      <div id="localConfig" class="w-full bg-slate-900/70 rounded-3xl p-5 border border-white/10 space-y-4 font-sans">
+      <div id="localConfig" class="panel-card w-full rounded-3xl p-5 space-y-4 font-sans">
         <div>
-          <label class="block text-sm font-bold text-slate-300 mb-2">Tu nombre</label>
-          <input type="text" id="localPlayerName" value="Tú" class="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-base text-white focus:outline-none focus:border-amber-500">
+          <label class="block text-sm font-bold mb-2" style="color:#e9d9b6">Tu nombre</label>
+          <input type="text" id="localPlayerName" value="Tú" class="col-input w-full rounded-xl px-4 py-3 text-base">
         </div>
         <div>
-          <label class="block text-sm font-bold text-slate-300 mb-2">Canicas por jugador</label>
+          <label class="block text-sm font-bold mb-2" style="color:#e9d9b6">Canicas por jugador</label>
           <div class="grid grid-cols-4 gap-2">
-            <button id="mb4"  onclick="setMarbleCount(4)"  class="py-3 rounded-xl bg-slate-800 border border-white/10 font-bold text-base">4</button>
-            <button id="mb6"  onclick="setMarbleCount(6)"  class="py-3 rounded-xl bg-slate-800 border border-white/10 font-bold text-base">6</button>
-            <button id="mb8"  onclick="setMarbleCount(8)"  class="py-3 rounded-xl bg-slate-800 border border-white/10 font-bold text-base">8</button>
-            <button id="mb10" onclick="setMarbleCount(10)" class="py-3 rounded-xl bg-slate-800 border border-white/10 font-bold text-base">10</button>
+            <button id="mb4"  onclick="setMarbleCount(4)"  class="chip py-3 rounded-xl font-bold text-base">4</button>
+            <button id="mb6"  onclick="setMarbleCount(6)"  class="chip py-3 rounded-xl font-bold text-base">6</button>
+            <button id="mb8"  onclick="setMarbleCount(8)"  class="chip py-3 rounded-xl font-bold text-base">8</button>
+            <button id="mb10" onclick="setMarbleCount(10)" class="chip py-3 rounded-xl font-bold text-base">10</button>
           </div>
         </div>
-        <button onclick="startLocalGame()" class="btn-primary w-full py-4 rounded-2xl text-xl">¡JUGAR CONTRA EL BOT!</button>
+        <button onclick="startLocalGame()" class="btn-primary lift w-full py-4 rounded-2xl text-xl">¡JUGAR CONTRA EL BOT!</button>
       </div>
 
       <!-- Config ONLINE -->
-      <div id="onlineConfig" class="w-full bg-slate-900/70 rounded-3xl p-5 border border-white/10 space-y-4 font-sans hidden">
+      <div id="onlineConfig" class="panel-card w-full rounded-3xl p-5 space-y-4 font-sans hidden">
         <div>
-          <label class="block text-sm font-bold text-slate-300 mb-2">Tu nombre</label>
-          <input type="text" id="onlineNickname" value="Jugador" class="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-base text-white focus:outline-none focus:border-amber-500">
+          <label class="block text-sm font-bold mb-2" style="color:#e9d9b6">Tu nombre</label>
+          <input type="text" id="onlineNickname" value="Jugador" class="col-input w-full rounded-xl px-4 py-3 text-base">
         </div>
 
         <div class="grid grid-cols-1 gap-3">
-          <div class="bg-slate-800/60 border border-white/10 p-4 rounded-2xl space-y-2">
-            <h3 class="font-bold text-amber-400 text-base">Crear sala (Anfitrión)</h3>
-            <p class="text-sm text-slate-400">Genera un código para compartir con tus amigos.</p>
-            <button onclick="createOnlineRoom()" id="btnCreateRoom" class="w-full py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-base shadow-md">Crear sala</button>
+          <div class="rounded-2xl p-4 space-y-2" style="background:rgba(36,22,12,0.55);border:1px solid rgba(255,220,170,0.12)">
+            <h3 class="font-bold text-base" style="color:var(--col-yellow)">Crear sala (Anfitrión)</h3>
+            <button onclick="createOnlineRoom()" id="btnCreateRoom" class="btn-primary lift w-full py-3 rounded-xl font-bold text-base">Crear sala</button>
           </div>
 
-          <div class="bg-slate-800/60 border border-white/10 p-4 rounded-2xl space-y-2">
-            <h3 class="font-bold text-sky-400 text-base">Unirme a una sala</h3>
-            <p class="text-sm text-slate-400">Ingresa el código que te compartieron.</p>
-            <input type="text" id="joinRoomCodeInput" placeholder="EJ: X8KA" maxlength="6" class="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-2 text-center font-mono text-lg uppercase text-amber-300 focus:outline-none">
-            <button onclick="joinOnlineRoom()" id="btnJoinRoom" class="w-full py-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-base shadow-md">Unirse</button>
+          <div class="rounded-2xl p-4 space-y-2" style="background:rgba(36,22,12,0.55);border:1px solid rgba(255,220,170,0.12)">
+            <h3 class="font-bold text-base" style="color:#6ea8ff">Unirme a una sala</h3>
+            <input type="text" id="joinRoomCodeInput" placeholder="EJ: X8KA" maxlength="6" class="col-input w-full rounded-lg px-3 py-2 text-center font-mono text-lg uppercase" style="color:var(--col-yellow)">
+            <button onclick="joinOnlineRoom()" id="btnJoinRoom" class="btn-blue lift w-full py-3 rounded-xl font-bold text-base">Unirse</button>
           </div>
         </div>
 
         <!-- Código de sala (host) -->
-        <div id="roomCodeDisplay" class="hidden bg-slate-950 border border-amber-500/30 p-4 rounded-2xl text-center space-y-2">
-          <span class="text-sm text-slate-400">Código de sala (compártelo):</span>
+        <div id="roomCodeDisplay" class="hidden rounded-2xl p-4 text-center space-y-2" style="background:rgba(36,22,12,0.85);border:1px solid rgba(255,205,0,0.35)">
+          <span class="text-sm" style="color:#e9d9b6">Código de sala (compártelo):</span>
           <div class="flex items-center justify-center gap-2">
-            <span id="roomCodeText" class="font-mono font-extrabold text-3xl text-amber-400 tracking-widest">----</span>
-            <button onclick="copyRoomCode()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-base text-slate-300"><i class="fa-solid fa-copy"></i></button>
+            <span id="roomCodeText" class="font-mono font-extrabold text-3xl tracking-widest" style="color:var(--col-yellow)">----</span>
+            <button onclick="copyRoomCode()" class="lift p-2 rounded-lg text-base" style="background:rgba(90,58,34,0.9);color:#e9d9b6"><i class="fa-solid fa-copy"></i></button>
           </div>
-          <p id="roomConnectedCount" class="text-sm text-emerald-400 font-bold">Conectados: 1</p>
-          <button id="btnStartOnlineGame" onclick="startHostOnlineGame()" class="w-full py-3 mt-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-bold text-base text-white">Iniciar partida</button>
+          <p id="roomConnectedCount" class="text-sm font-bold" style="color:#8bd48b">Conectados: 1</p>
+          <button id="btnStartOnlineGame" onclick="startHostOnlineGame()" class="btn-red lift w-full py-3 mt-1 rounded-xl font-bold text-base">Iniciar partida</button>
         </div>
       </div>
 
-      <button onclick="openRulesModal()" class="text-slate-400 hover:text-white font-sans text-base flex items-center gap-2">
-        <i class="fa-solid fa-circle-question text-amber-400"></i> Ver reglas
+      <button onclick="openRulesModal()" class="lift font-sans text-base flex items-center gap-2" style="color:#e9d9b6">
+        <i class="fa-solid fa-circle-question" style="color:var(--col-yellow)"></i> Ver reglas
       </button>
     </div>
   </div>
@@ -142,114 +121,99 @@
        ============================================================ -->
   <div id="gameScreen" class="hidden min-h-screen flex flex-col">
 
-    <header class="w-full px-4 py-3 bg-slate-900/80 backdrop-blur-md border-b border-white/10 flex items-center justify-between z-20">
-      <div class="flex items-center space-x-3">
-        <div class="w-11 h-11 rounded-xl bg-amber-700 border-2 border-amber-500 flex items-center justify-center text-amber-200 shadow-md">
-          <i class="fa-solid fa-cubes text-xl"></i>
-        </div>
-        <div>
-          <h1 class="font-display text-xl text-amber-400 tracking-wide">¿POR QUÉ SIEMPRE YO?</h1>
-          <p class="text-sm text-slate-400 font-sans">Juego de mesa «Caja 6»</p>
-        </div>
-      </div>
-
-      <div id="onlineBadge" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800 border border-white/10 text-sm font-sans">
-        <span id="onlineDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span id="onlineText" class="text-slate-300 font-bold">Online</span>
-      </div>
+    <header class="w-full px-4 py-2.5 flex items-center justify-between z-20" style="background:rgba(36,22,12,0.85);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,220,170,0.12)">
+      <h1 class="text-lg sm:text-2xl" data-title data-title-size="0.8em"></h1>
 
       <div class="flex items-center gap-2">
-        <button onclick="toggleSound()" title="Sonido" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center border border-white/10 transition-all">
+        <div id="onlineBadge" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-sans" style="background:rgba(36,22,12,0.7);border:1px solid rgba(255,220,170,0.12)">
+          <span id="onlineDot" class="w-2.5 h-2.5 rounded-full animate-pulse" style="background:#8bd48b"></span>
+          <span id="onlineText" class="font-bold" style="color:#e9d9b6">Online</span>
+        </div>
+        <button onclick="toggleSound()" title="Sonido" class="lift w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(90,58,34,0.85);color:#e9d9b6;border:1px solid rgba(255,220,170,0.12)">
           <i id="soundIcon" class="fa-solid fa-volume-high"></i>
         </button>
-        <button onclick="openRulesModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-sans text-slate-300 flex items-center gap-2 border border-white/10 transition-all">
-          <i class="fa-solid fa-circle-question text-amber-400"></i><span class="hidden sm:inline">Reglas</span>
+        <button onclick="openRulesModal()" title="Reglas" class="lift w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(90,58,34,0.85);color:var(--col-yellow);border:1px solid rgba(255,220,170,0.12)">
+          <i class="fa-solid fa-circle-question"></i>
         </button>
-        <button onclick="handleQuit()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-red-600/80 text-sm font-sans font-bold text-white flex items-center gap-2 border border-white/10 transition-all">
-          <i class="fa-solid fa-door-open"></i><span class="hidden sm:inline">Salir</span>
+        <button onclick="handleQuit()" title="Salir" class="lift w-10 h-10 rounded-xl flex items-center justify-center text-white" style="background:rgba(216,35,42,0.75);border:1px solid rgba(255,220,170,0.12)">
+          <i class="fa-solid fa-door-open"></i>
         </button>
       </div>
     </header>
 
-    <main class="flex-1 max-w-6xl w-full mx-auto p-4 flex flex-col lg:flex-row items-center justify-center gap-6">
+    <main class="flex-1 max-w-6xl w-full mx-auto p-4 flex flex-col lg:flex-row items-center justify-center gap-5">
 
-      <div id="playersPanel" class="w-full lg:w-72 flex flex-row lg:flex-col gap-3 order-2 lg:order-1"></div>
+      <div id="playersPanel" class="w-full lg:w-64 flex flex-row lg:flex-col gap-3 order-2 lg:order-1"></div>
 
-      <div class="flex-1 flex flex-col items-center justify-center order-1 lg:order-2 w-full max-w-md sm:max-w-lg">
-        <div class="w-full aspect-square wood-frame p-4 sm:p-6 relative flex flex-col justify-between">
-          <div id="boardSurface" class="w-full h-full rounded-2xl board-blue relative p-4 flex flex-col justify-between overflow-hidden shadow-inner">
-            <div class="absolute inset-0 bg-black/10 pointer-events-none"></div>
+      <!-- TABLERO -->
+      <div class="flex-1 flex flex-col items-center justify-center order-1 lg:order-2 w-full max-w-sm sm:max-w-md">
+        <div class="w-full aspect-square wood-frame p-3 sm:p-5 relative flex flex-col justify-between">
+          <span class="carved-leaf tl"></span><span class="carved-leaf tr"></span>
+          <span class="carved-leaf bl"></span><span class="carved-leaf br"></span>
 
-            <div class="w-full text-center pt-2 relative z-10">
-              <h2 class="curved-title text-2xl sm:text-3xl font-extrabold text-pink-400 tracking-wider">¿POR QUÉ SIEMPRE YO?</h2>
-            </div>
+          <div id="boardSurface" class="board-surface w-full h-full rounded-xl relative p-4 flex flex-col justify-between overflow-hidden">
+            <!-- Stickers colombianos -->
+            <span class="sticker sticker-chiva"></span>
+            <span class="sticker sticker-sombrero"></span>
+            <span class="sticker sticker-placa"></span>
+            <span class="sticker sticker-canasta"></span>
 
-            <div class="relative w-full h-[72%] my-auto flex items-center justify-center">
-              <div class="absolute top-[2%] left-1/2 -translate-x-1/2 flex flex-col items-center">
-                <span class="text-white font-display text-xl font-bold drop-shadow">1</span>
-                <div id="hole-1" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full hole-socket flex items-center justify-center relative transition-all" onclick="handleHoleClick(1)"></div>
+            <div class="relative w-full h-full flex items-center justify-center">
+              <div class="absolute top-[3%] left-1/2 -translate-x-1/2 flex flex-col items-center">
+                <span class="font-display text-xl font-bold" style="color:var(--wood-dark)">1</span>
+                <div id="hole-1" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full hole-socket flex items-center justify-center relative" onclick="handleHoleClick(1)"></div>
               </div>
-              <div class="absolute top-[35%] left-[8%] flex items-center gap-2">
-                <span class="text-white font-display text-xl font-bold drop-shadow">3</span>
-                <div id="hole-3" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full hole-socket flex items-center justify-center relative transition-all" onclick="handleHoleClick(3)"></div>
+              <div class="absolute top-[38%] left-[6%] flex items-center gap-1.5">
+                <span class="font-display text-xl font-bold" style="color:var(--wood-dark)">5</span>
+                <div id="hole-5" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full hole-socket flex items-center justify-center relative" onclick="handleHoleClick(5)"></div>
               </div>
-              <div class="absolute top-[35%] right-[8%] flex items-center gap-2">
-                <div id="hole-2" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full hole-socket flex items-center justify-center relative transition-all" onclick="handleHoleClick(2)"></div>
-                <span class="text-white font-display text-xl font-bold drop-shadow">2</span>
+              <div class="absolute top-[38%] right-[6%] flex items-center gap-1.5">
+                <div id="hole-2" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full hole-socket flex items-center justify-center relative" onclick="handleHoleClick(2)"></div>
+                <span class="font-display text-xl font-bold" style="color:var(--wood-dark)">2</span>
               </div>
-              <div class="absolute bottom-[4%] left-[15%] flex items-center gap-2">
-                <span class="text-white font-display text-xl font-bold drop-shadow">4</span>
-                <div id="hole-4" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full hole-socket flex items-center justify-center relative transition-all" onclick="handleHoleClick(4)"></div>
+              <div class="absolute bottom-[5%] left-[18%] flex items-center gap-1.5">
+                <span class="font-display text-xl font-bold" style="color:var(--wood-dark)">4</span>
+                <div id="hole-4" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full hole-socket flex items-center justify-center relative" onclick="handleHoleClick(4)"></div>
               </div>
-              <div class="absolute bottom-[4%] right-[15%] flex items-center gap-2">
-                <div id="hole-5" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full hole-socket flex items-center justify-center relative transition-all" onclick="handleHoleClick(5)"></div>
-                <span class="text-white font-display text-xl font-bold drop-shadow">5</span>
+              <div class="absolute bottom-[5%] right-[18%] flex items-center gap-1.5">
+                <div id="hole-3" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full hole-socket flex items-center justify-center relative" onclick="handleHoleClick(3)"></div>
+                <span class="font-display text-xl font-bold" style="color:var(--wood-dark)">3</span>
               </div>
-              <div class="absolute left-1/2 top-[52%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10">
-                <div id="hole-6" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full hole-six-pit border-4 border-pink-500/80 flex items-center justify-center relative shadow-2xl transition-all" onclick="handleHoleClick(6)">
-                  <span class="font-display text-6xl sm:text-7xl font-extrabold text-pink-500/90 drop-shadow-lg pointer-events-none select-none">6</span>
+              <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10">
+                <div id="hole-6" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full hole-six-pit flex items-center justify-center relative" onclick="handleHoleClick(6)">
+                  <span class="font-display text-5xl sm:text-6xl font-extrabold pointer-events-none select-none" style="color:var(--col-blue);opacity:0.85">6</span>
                   <div id="pitMarbles" class="absolute inset-0 flex items-center justify-center overflow-hidden rounded-full pointer-events-none"></div>
                 </div>
               </div>
-            </div>
-
-            <div class="w-full flex justify-center gap-2 pt-1">
-              <button onclick="setBoardTheme('board-blue')"   class="w-5 h-5 rounded-full bg-sky-500 border border-white/50"     title="Azul"></button>
-              <button onclick="setBoardTheme('board-purple')" class="w-5 h-5 rounded-full bg-purple-500 border border-white/50"  title="Púrpura"></button>
-              <button onclick="setBoardTheme('board-green')"  class="w-5 h-5 rounded-full bg-emerald-500 border border-white/50" title="Verde"></button>
-              <button onclick="setBoardTheme('board-orange')" class="w-5 h-5 rounded-full bg-orange-500 border border-white/50"  title="Naranja"></button>
-              <button onclick="setBoardTheme('board-teal')"   class="w-5 h-5 rounded-full bg-teal-500 border border-white/50"    title="Teal"></button>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="w-full lg:w-72 bg-slate-900/90 rounded-3xl p-5 border border-white/10 shadow-2xl flex flex-col items-center justify-between order-3 space-y-4">
+      <!-- PANEL DERECHO: turno + dado -->
+      <div class="panel-card w-full lg:w-64 rounded-3xl p-5 flex flex-col items-center justify-between order-3 gap-4">
         <div class="w-full text-center">
-          <span class="text-sm uppercase font-sans font-bold text-slate-400 tracking-wider">Turno actual</span>
-          <div id="turnIndicator" class="mt-1 py-3 px-4 rounded-2xl bg-slate-800 border border-white/10 flex items-center justify-center space-x-3">
-            <div id="turnMarbleDot" class="w-6 h-6 rounded-full marble-green"></div>
-            <h3 id="turnPlayerName" class="font-display text-xl text-white">Jugador 1</h3>
+          <span class="text-xs uppercase font-sans font-bold tracking-wider" style="color:#c9b690">Turno actual</span>
+          <div id="turnIndicator" class="mt-1 py-2.5 px-4 rounded-2xl flex items-center justify-center gap-3" style="background:rgba(36,22,12,0.6);border:1px solid rgba(255,220,170,0.12)">
+            <div id="turnMarbleDot" class="w-7 h-7"></div>
+            <h3 id="turnPlayerName" class="font-display text-lg text-white">Jugador 1</h3>
           </div>
         </div>
 
-        <div class="flex flex-col items-center justify-center my-2 space-y-3">
-          <div id="dice3d" class="dice-3d">
-            <span id="diceValue" class="font-display text-4xl font-extrabold text-slate-800">?</span>
+        <div class="flex flex-col items-center justify-center gap-3">
+          <!-- El dado ES el botón: se toca para lanzar -->
+          <div id="dice3d" class="dice-3d" onclick="handleDiceTap()">
+            <span id="diceValue" class="font-display text-4xl font-extrabold">?</span>
           </div>
-          <p id="actionLog" class="text-base text-amber-300 font-sans text-center min-h-[48px] flex items-center justify-center px-2 leading-snug">
-            ¡Presiona «Lanzar Dado» para empezar!
+          <p id="diceHint" class="dice-hint text-center"></p>
+          <p id="actionLog" class="text-base font-sans text-center min-h-[44px] flex items-center justify-center px-2 leading-snug" style="color:var(--col-yellow)">
+            ¡Toca el dado para empezar!
           </p>
         </div>
 
-        <div class="w-full space-y-3">
-          <button id="btnRoll" onclick="handleRollDice()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-display font-extrabold text-xl shadow-lg shadow-amber-500/25 active:scale-95 transition-all flex items-center justify-center gap-2">
-            <i class="fa-solid fa-dice text-xl"></i><span>LANZAR DADO</span>
-          </button>
-          <button id="btnPass" onclick="handlePassTurn()" disabled class="w-full py-3 rounded-2xl bg-slate-800 text-slate-500 font-sans font-bold text-base border border-white/5 cursor-not-allowed flex items-center justify-center gap-2">
-            <i class="fa-solid fa-forward text-sm"></i><span>Pasar turno</span>
-          </button>
-        </div>
+        <button id="btnPass" onclick="handlePassTurn()" disabled class="btn-secondary w-full py-3 rounded-2xl font-sans font-bold text-base opacity-40 cursor-not-allowed flex items-center justify-center gap-2">
+          <i class="fa-solid fa-forward text-sm"></i><span>Pasar turno</span>
+        </button>
       </div>
     </main>
   </div>
@@ -259,39 +223,38 @@
        ============================================================ -->
   <div id="endScreen" class="screen-overlay hidden">
     <div id="endFloaties" class="absolute inset-0 overflow-hidden"></div>
-    <!-- Capa de lágrimas (solo visible en derrota) -->
     <div id="tearsLayer" class="absolute inset-0 overflow-hidden pointer-events-none"></div>
 
     <div class="relative z-10 w-full max-w-md text-center flex flex-col items-center gap-6">
 
-      <!-- ===== VISTA GANADOR ===== -->
-      <div id="winView" class="w-full flex flex-col items-center gap-6">
-        <div class="text-7xl text-amber-400 trophy-bounce"><i class="fa-solid fa-trophy"></i></div>
-        <h2 class="mega-title text-4xl sm:text-5xl text-amber-400">¡GANADOR!</h2>
-        <div class="bg-slate-900/80 border border-amber-500/40 rounded-3xl px-8 py-6 w-full">
-          <p class="text-slate-300 font-sans text-lg">El ganador es</p>
-          <p id="winnerName" class="font-display text-3xl text-pink-400 mt-1 break-words">Jugador</p>
+      <!-- GANADOR -->
+      <div id="winView" class="w-full flex flex-col items-center gap-5">
+        <div class="text-7xl trophy-bounce" style="color:var(--col-yellow)"><i class="fa-solid fa-trophy"></i></div>
+        <h2 class="mega-title text-4xl sm:text-5xl" style="color:var(--col-yellow)">¡GANADOR!</h2>
+        <div class="panel-card rounded-3xl px-8 py-6 w-full">
+          <p class="font-sans text-lg" style="color:#e9d9b6">El ganador es</p>
+          <p id="winnerName" class="font-display text-3xl mt-1 break-words" style="color:var(--col-red)">Jugador</p>
         </div>
       </div>
 
-      <!-- ===== VISTA PERDEDOR ===== -->
-      <div id="loseView" class="w-full flex flex-col items-center gap-6 hidden">
-        <div class="text-7xl text-sky-400 sad-shake"><i class="fa-solid fa-face-sad-tear"></i></div>
-        <h2 class="mega-title text-4xl sm:text-5xl text-sky-400">¡PERDISTE!</h2>
-        <div class="bg-slate-900/80 border border-sky-500/40 rounded-3xl px-8 py-6 w-full">
-          <p class="text-slate-300 font-sans text-lg">Esta vez ganó</p>
-          <p id="loserWinnerName" class="font-display text-3xl text-pink-400 mt-1 break-words">Jugador</p>
-          <p class="text-slate-400 font-sans text-sm mt-2">¡Más suerte la próxima! 😢</p>
+      <!-- PERDEDOR -->
+      <div id="loseView" class="w-full flex flex-col items-center gap-5 hidden">
+        <div class="text-7xl sad-shake" style="color:#6ea8ff"><i class="fa-solid fa-face-sad-tear"></i></div>
+        <h2 class="mega-title text-4xl sm:text-5xl" style="color:var(--col-blue)">¡PERDISTE!</h2>
+        <div class="panel-card rounded-3xl px-8 py-6 w-full" style="border-color:rgba(110,168,255,0.4)">
+          <p class="font-sans text-lg" style="color:#e9d9b6">Esta vez ganó</p>
+          <p id="loserWinnerName" class="font-display text-3xl mt-1 break-words" style="color:var(--col-red)">Jugador</p>
+          <p class="font-sans text-sm mt-2" style="color:#c9b690">¡Más suerte la próxima! 😢</p>
         </div>
       </div>
 
-      <p id="rematchStatus" class="text-amber-300 font-sans text-base min-h-[24px]"></p>
+      <p id="rematchStatus" class="font-sans text-base min-h-[24px]" style="color:var(--col-yellow)"></p>
 
       <div class="w-full flex flex-col gap-3">
-        <button id="btnRematch" onclick="handleRematch()" class="btn-primary w-full py-4 rounded-2xl text-xl">
+        <button id="btnRematch" onclick="handleRematch()" class="btn-primary lift w-full py-4 rounded-2xl text-xl">
           <i class="fa-solid fa-rotate-right mr-2"></i>VOLVER A JUGAR
         </button>
-        <button onclick="handleQuit()" class="btn-secondary w-full py-3 rounded-2xl text-lg">
+        <button onclick="handleQuit()" class="btn-secondary lift w-full py-3 rounded-2xl text-lg">
           <i class="fa-solid fa-door-open mr-2"></i>Salir
         </button>
       </div>
@@ -301,28 +264,29 @@
   <!-- ============================================================
        MODAL DE REGLAS
        ============================================================ -->
-  <div id="rulesModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[70] hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-white/10 rounded-3xl p-6 max-w-md w-full space-y-4 font-sans">
-      <div class="flex items-center justify-between border-b border-white/10 pb-3">
-        <h3 class="font-display text-2xl text-amber-400">Reglas del juego</h3>
-        <button onclick="closeRulesModal()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-xl"></i></button>
+  <div id="rulesModal" class="fixed inset-0 z-[70] hidden flex items-center justify-center p-4" style="background:rgba(0,0,0,0.8);backdrop-filter:blur(8px)">
+    <div class="panel-card rounded-3xl p-6 max-w-md w-full space-y-4 font-sans">
+      <div class="flex items-center justify-between pb-3" style="border-bottom:1px solid rgba(255,220,170,0.15)">
+        <h3 class="font-display text-2xl" style="color:var(--col-yellow)">Reglas del juego</h3>
+        <button onclick="closeRulesModal()" class="lift p-1" style="color:#e9d9b6"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
-      <div class="space-y-3 text-base text-slate-300 leading-relaxed max-h-80 overflow-y-auto pr-2">
-        <p><strong class="text-amber-400">Objetivo:</strong> ser el primer jugador en quedarse con <strong>0 CANICAS</strong>.</p>
+      <div class="space-y-3 text-base leading-relaxed max-h-80 overflow-y-auto pr-2" style="color:#e9d9b6">
+        <p><strong style="color:var(--col-yellow)">Objetivo:</strong> ser el primer jugador en quedarse con <strong>0 CANICAS</strong>.</p>
         <ul class="list-disc list-inside space-y-2">
           <li>El tablero tiene 6 hoyos. Los hoyos <strong>1, 2, 3, 4 y 5</strong> sostienen canicas. El hoyo <strong>6</strong> es un pozo profundo.</li>
-          <li>En tu turno, lanzas el dado. <strong>DEBES HACER CLIC en la casilla indicada por el dado.</strong></li>
-          <li class="text-red-400"><strong>¡CUIDADO!</strong> Si haces clic en la casilla equivocada, recibes <strong>+1 canica de castigo</strong> y tu turno termina.</li>
+          <li>En tu turno, lanzas el dado. <strong>Debes hacer clic en la casilla indicada por el dado.</strong></li>
+          <li style="color:#ff9a9a"><strong>¡Cuidado!</strong> Si haces clic en la casilla equivocada, recibes <strong>+1 canica de castigo</strong> y tu turno termina.</li>
           <li><strong>Si sale 6:</strong> tu canica cae en el hoyo 6 y desaparece. Puedes volver a lanzar o pasar.</li>
-          <li><strong>Si sale 1-5 y el hoyo está VACÍO:</strong> colocas una canica ahí. Puedes volver a lanzar o pasar.</li>
-          <li><strong>Si sale 1-5 y el hoyo está OCUPADO:</strong> te llevas esa canica (+1) y pierdes el turno.</li>
+          <li><strong>Si sale 1-5 y el hoyo está vacío:</strong> colocas una canica ahí. Puedes volver a lanzar o pasar.</li>
+          <li><strong>Si sale 1-5 y el hoyo está ocupado:</strong> te llevas esa canica (+1) y pierdes el turno.</li>
         </ul>
       </div>
-      <button onclick="closeRulesModal()" class="btn-primary w-full py-3 rounded-xl text-lg">¡Entendido!</button>
+      <button onclick="closeRulesModal()" class="btn-primary lift w-full py-3 rounded-xl text-lg">¡Entendido!</button>
     </div>
   </div>
 
-  <!-- Lógica del juego -->
+  <!-- Assets gráficos (SVG) + lógica -->
+  <script src="assets.js"></script>
   <script src="game.js"></script>
 </body>
 </html>
