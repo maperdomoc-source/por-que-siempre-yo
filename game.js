@@ -146,8 +146,27 @@ window.addEventListener('DOMContentLoaded', () => {
   setMarbleCount(6);
   showScreen('start');
 
-  // desbloquear audio en el primer toque
-  document.body.addEventListener('pointerdown', ensureAudio, { once: true });
+  // Desbloquear audio en el primer gesto del usuario (clave en iOS/Safari).
+  // Escuchamos varios tipos de evento y, al primero, reanudamos el AudioContext
+  // y tocamos un tono silencioso para "despertar" el audio en móviles.
+  const unlockAudio = () => {
+    const ctx = ensureAudio();
+    if (ctx) {
+      try {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, ctx.currentTime);
+        osc.connect(g); g.connect(ctx.destination);
+        osc.start(); osc.stop(ctx.currentTime + 0.02);
+      } catch (e) {}
+    }
+    document.body.removeEventListener('pointerdown', unlockAudio);
+    document.body.removeEventListener('touchstart', unlockAudio);
+    document.body.removeEventListener('click', unlockAudio);
+  };
+  document.body.addEventListener('pointerdown', unlockAudio);
+  document.body.addEventListener('touchstart', unlockAudio);
+  document.body.addEventListener('click', unlockAudio);
 });
 
 // ============================================================
@@ -428,6 +447,9 @@ function executeHoleClick(clickedHoleNum, playerIdx) {
   if (clickedHoleNum !== targetHole) {
     curPlayer.marbles++;
     playErrorSound();
+    if (gameState.gameType === 'online' && gameState.isHost) {
+      broadcastToGuests({ type: 'FX_PENALTY' });
+    }
     renderPlayersPanel();
     logAction(`❌ ¡ERROR! Presionó la casilla ${clickedHoleNum} en vez de la ${targetHole}. ¡PENALIZACIÓN: +1 CANICA! Turno terminado.`);
 
@@ -451,6 +473,9 @@ function executeTurnResult(diceVal) {
     gameState.hasPlacedThisTurn = true;
     animateMarbleIntoSix(curPlayer);
     playMarbleSound();
+    if (gameState.gameType === 'online' && gameState.isHost) {
+      broadcastToGuests({ type: 'FX_MARBLE_SIX', styleClass: curPlayer.style.class });
+    }
     logAction(`¡Excelente! La canica cayó en el hoyo 6 🎁 (Quedan: ${curPlayer.marbles})`);
 
     if (checkWinCondition()) return;
@@ -465,6 +490,9 @@ function executeTurnResult(diceVal) {
       gameState.boardHoles[diceVal] = curPlayer;
       gameState.hasPlacedThisTurn = true;
       playMarbleSound();
+      if (gameState.gameType === 'online' && gameState.isHost) {
+        broadcastToGuests({ type: 'FX_MARBLE_PLACED' });
+      }
       renderBoardHoles();
       renderPlayersPanel();
       logAction(`¡Correcto! Ocupó la casilla ${diceVal}. (Quedan: ${curPlayer.marbles})`);
@@ -477,6 +505,9 @@ function executeTurnResult(diceVal) {
       gameState.boardHoles[diceVal] = null;
       curPlayer.marbles++;
       playErrorSound();
+      if (gameState.gameType === 'online' && gameState.isHost) {
+        broadcastToGuests({ type: 'FX_PENALTY' });
+      }
       renderBoardHoles();
       renderPlayersPanel();
       logAction(`¡Casilla ${diceVal} estaba OCUPADA! ${curPlayer.name} recoge la canica (+1) y pierde el turno.`);
@@ -878,6 +909,16 @@ function handleIncomingNetworkData(conn, data) {
         break;
       case 'DICE_ANIM':
         animateDice(data.value, data.playerName);
+        break;
+      case 'FX_MARBLE_PLACED':
+        playMarbleSound();
+        break;
+      case 'FX_MARBLE_SIX':
+        playMarbleSound();
+        animateMarbleIntoSix({ style: { class: data.styleClass || 'marble-green' } });
+        break;
+      case 'FX_PENALTY':
+        playErrorSound();
         break;
       case 'SYNC_STATE':
         gameState.players = data.players;
