@@ -197,6 +197,16 @@ body, .screen-overlay, #gameScreen {
   width: 100%;
   line-height: 0;
 }
+
+/* Flotación por palabra (solo vertical, fiable en SVG <g>) */
+@keyframes wordFloatY {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(var(--fl-amp, -9px)); }
+}
+.stroke-title-host [data-word-group] { will-change: transform; }
+@media (prefers-reduced-motion: reduce) {
+  .stroke-title-host [data-word-group] { animation: none !important; }
+}
 .stroke-title-svg {
   display: block;
   width: 100%;

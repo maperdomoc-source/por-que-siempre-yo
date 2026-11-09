@@ -3,36 +3,32 @@
    Réplica de la animación de React Bits:
    - dibuja el contorno de cada palabra (stroke-dashoffset)
    - rellena con un "wipe" direccional
-   - trigger: una vez al montar + redibujar al pasar el mouse (hoverRedraw)
-   Las "O" se sustituyen por canicas (sin trazo animado).
+   - trigger: una vez al montar + redibujar al pasar el mouse
+   - flotación independiente por palabra (cada palabra en su propio <g>,
+     que SÍ respeta transform en todos los navegadores)
+   Las "O" se sustituyen por canicas.
    ============================================================ */
 
 const SVGNS = 'http://www.w3.org/2000/svg';
 
-// Palabras del título con su color. El texto se segmenta por palabra para
-// poder darle un color distinto a cada una. Las "O" (marcadas con *) se
-// renderizan como canica en lugar de glifo.
-// Formato: { text, color }  — usamos un marcador ⊙ para la posición de canica.
+// Palabras del título con su color. ⊙ marca la posición de una canica.
 const TITLE_SEGMENTS = [
-  { text: '¿P⊙R',   color: '#9fa650', signAt: [0] },         // ¿ dorado, resto oliva
-  { text: 'QUÉ',    color: '#9fa650' },
+  { text: '¿P⊙R',    color: '#9fa650', signAt: [0] },
+  { text: 'QUÉ',     color: '#9fa650' },
   { text: 'SIEMPRE', color: '#0b46cd' },
-  { text: 'Y⊙?',    color: '#e44c50', signAt: [2] },         // ? dorado
+  { text: 'Y⊙?',     color: '#e44c50', signAt: [2] },
 ];
 const SIGN_COLOR = '#ebc254';
 
-/* Construye un <span> con el SVG del título animado dentro de `host`. */
 function buildStrokeTitle(host, opts = {}) {
   const fontSize = opts.fontSize || 60;
   const fontWeight = opts.fontWeight || 800;
   const letterSpacing = opts.letterSpacing != null ? opts.letterSpacing : -1;
-  const strokeColor = opts.strokeColor || 'rgba(255,255,255,0.55)';
-  const strokeWidth = opts.strokeWidth != null ? opts.strokeWidth : Math.max(fontSize * 0.04, 2.5); // grosor para engordar la fuente
+  const strokeWidth = opts.strokeWidth != null ? opts.strokeWidth : Math.max(fontSize * 0.04, 2.5);
 
   host.innerHTML = '';
   host.classList.add('stroke-title-host');
 
-  // SVG raíz (se dimensiona tras medir)
   const svg = document.createElementNS(SVGNS, 'svg');
   svg.setAttribute('class', 'stroke-title-svg');
   svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
@@ -40,259 +36,249 @@ function buildStrokeTitle(host, opts = {}) {
   svg.setAttribute('role', 'img');
   host.appendChild(svg);
 
-  const defs = document.createElementNS(SVGNS, 'defs');
-  svg.appendChild(defs);
-
-  // Fuente del título: Righteous (la original del prompt de React Bits,
-  // que hereda la tipografía display de la app).
   const fontStyle = `font-family:'Righteous',cursive;font-size:${fontSize}px;font-weight:${fontWeight};letter-spacing:${letterSpacing}px;`;
+  const spaceWidth = fontSize * 0.32; // separación entre palabras
 
-  // Grupo de relleno (texto con color, revelado por wipe).
-  // Añadimos un stroke del MISMO color que el relleno para engrosar la fuente.
-  const fillText = document.createElementNS(SVGNS, 'text');
-  fillText.setAttribute('x', '0'); fillText.setAttribute('y', '0');
-  fillText.setAttribute('stroke-width', strokeWidth);
-  fillText.setAttribute('stroke-linejoin', 'round');
-  fillText.setAttribute('stroke-linecap', 'round');
-  fillText.setAttribute('paint-order', 'stroke');
-  fillText.setAttribute('style', fontStyle);
+  // --- Construcción: un GRUPO <g> por palabra ---
+  // Cada grupo contiene su <text> de contorno + <text> de relleno (con wipe
+  // propio) + sus canicas. Medimos y posicionamos palabra por palabra.
+  const words = [];  // { g, strokeText, fillText, wipeRect, marbleSlots:[{tspan}], strokes:[] }
 
-  // Grupo de contorno (se dibuja con dashoffset). El color del trazo coincide
-  // con el color de cada palabra (asignado por tspan) para que NO se vea una
-  // línea de otro color: el borde es del mismo color que la letra.
-  const strokeText = document.createElementNS(SVGNS, 'text');
-  strokeText.setAttribute('x', '0'); strokeText.setAttribute('y', '0');
-  strokeText.setAttribute('fill', 'none');
-  strokeText.setAttribute('stroke-width', strokeWidth);
-  strokeText.setAttribute('stroke-linejoin', 'round');
-  strokeText.setAttribute('stroke-linecap', 'round');
-  strokeText.setAttribute('style', fontStyle);
-
-  // Posiciones de canica (en coordenadas de glifo) las calculamos tras medir
-  const marbleSlots = []; // { tspan, color }
-
-  // Construir tspans palabra por palabra. Marcamos cada tspan con data-word
-  // = índice de palabra, para poder flotarla de forma independiente.
-  const marbleSlotWord = []; // palabra de cada canica, para flotar con su palabra
   TITLE_SEGMENTS.forEach((seg, segIdx) => {
+    // Grupo EXTERNO: lo anima GSAP (flotación). No lleva transform propio.
+    const g = document.createElementNS(SVGNS, 'g');
+    g.setAttribute('data-word-group', segIdx);
+    svg.appendChild(g);
+    // Grupo INTERNO: lleva la traslación de posicionamiento (no lo toca GSAP).
+    const gPos = document.createElementNS(SVGNS, 'g');
+    g.appendChild(gPos);
+
+    // contorno
+    const strokeText = document.createElementNS(SVGNS, 'text');
+    strokeText.setAttribute('x', '0'); strokeText.setAttribute('y', '0');
+    strokeText.setAttribute('fill', 'none');
+    strokeText.setAttribute('stroke-width', strokeWidth);
+    strokeText.setAttribute('stroke-linejoin', 'round');
+    strokeText.setAttribute('stroke-linecap', 'round');
+    strokeText.setAttribute('style', fontStyle);
+
+    // relleno (con stroke del mismo color para engrosar)
+    const fillText = document.createElementNS(SVGNS, 'text');
+    fillText.setAttribute('x', '0'); fillText.setAttribute('y', '0');
+    fillText.setAttribute('stroke-width', strokeWidth);
+    fillText.setAttribute('stroke-linejoin', 'round');
+    fillText.setAttribute('stroke-linecap', 'round');
+    fillText.setAttribute('paint-order', 'stroke');
+    fillText.setAttribute('style', fontStyle);
+
+    const marbleSlots = [];
     const chars = Array.from(seg.text);
     chars.forEach((ch, i) => {
       const isSign = seg.signAt && seg.signAt.includes(i);
       const color = isSign ? SIGN_COLOR : seg.color;
-
       if (ch === '⊙') {
         const sp = document.createElementNS(SVGNS, 'tspan');
         sp.setAttribute('fill', 'transparent');
         sp.setAttribute('stroke', 'none');
-        sp.setAttribute('data-word', segIdx);
         sp.textContent = 'O';
-        sp.setAttribute('data-marble', '1');
         fillText.appendChild(sp);
-
         const sp2 = document.createElementNS(SVGNS, 'tspan');
         sp2.setAttribute('stroke', 'none');
-        sp2.setAttribute('data-word', segIdx);
         sp2.textContent = 'O';
         strokeText.appendChild(sp2);
         marbleSlots.push({ tspan: sp });
-        marbleSlotWord.push(segIdx);
       } else {
         const t = document.createElementNS(SVGNS, 'tspan');
         t.setAttribute('fill', color);
         t.setAttribute('stroke', color);
         t.setAttribute('data-fill-char', '1');
-        t.setAttribute('data-word', segIdx);
         t.textContent = ch;
         fillText.appendChild(t);
-
         const ts = document.createElementNS(SVGNS, 'tspan');
         ts.setAttribute('stroke', color);
         ts.setAttribute('data-stroke-char', '1');
-        ts.setAttribute('data-word', segIdx);
         ts.textContent = ch;
         strokeText.appendChild(ts);
       }
     });
-    if (segIdx < TITLE_SEGMENTS.length - 1) {
-      [fillText, strokeText].forEach(parent => {
-        const sp = document.createElementNS(SVGNS, 'tspan');
-        sp.textContent = ' ';
-        parent.appendChild(sp);
-      });
-    }
+
+    // wipe clip para esta palabra
+    const defs = document.createElementNS(SVGNS, 'defs');
+    const wipeId = 'stk-w-' + Math.random().toString(36).slice(2, 7);
+    const clip = document.createElementNS(SVGNS, 'clipPath');
+    clip.setAttribute('id', wipeId);
+    clip.setAttribute('clipPathUnits', 'userSpaceOnUse');
+    const wipeRect = document.createElementNS(SVGNS, 'rect');
+    clip.appendChild(wipeRect);
+    defs.appendChild(clip);
+    fillText.setAttribute('clip-path', `url(#${wipeId})`);
+
+    gPos.appendChild(defs);
+    gPos.appendChild(strokeText);
+    gPos.appendChild(fillText);
+
+    const marbleGroup = document.createElementNS(SVGNS, 'g');
+    gPos.appendChild(marbleGroup);
+
+    words.push({ g, gPos, strokeText, fillText, wipeRect, marbleSlots, marbleGroup, box: null });
   });
 
-  // clipPath para el wipe del relleno
-  const wipeId = 'stk-wipe-' + Math.random().toString(36).slice(2, 7);
-  const clip = document.createElementNS(SVGNS, 'clipPath');
-  clip.setAttribute('id', wipeId);
-  clip.setAttribute('clipPathUnits', 'userSpaceOnUse');
-  const wipeRect = document.createElementNS(SVGNS, 'rect');
-  clip.appendChild(wipeRect);
-  defs.appendChild(clip);
-  fillText.setAttribute('clip-path', `url(#${wipeId})`);
-
-  // Orden de pintado: contorno primero, luego relleno (encima)
-  svg.appendChild(strokeText);
-  svg.appendChild(fillText);
-
-  // Grupo de canicas DENTRO del SVG (mismo sistema de coordenadas que el texto)
-  const marbleGroup = document.createElementNS(SVGNS, 'g');
-  svg.appendChild(marbleGroup);
-
-  // Medir y animar cuando el layout esté listo
+  // --- Medir, posicionar cada palabra en secuencia, animar ---
   const run = () => {
-    let bbox;
-    try { bbox = strokeText.getBBox(); } catch (e) { return; }
-    if (!bbox || !bbox.width) return;
+    // Medir cada palabra (en su origen 0,0)
+    let totalW = 0, maxTop = Infinity, maxBot = -Infinity;
+    const metrics = [];
+    for (const wd of words) {
+      let bb;
+      try { bb = wd.strokeText.getBBox(); } catch (e) { return; }
+      if (!bb || !bb.width) return;
+      metrics.push(bb);
+      totalW += bb.width;
+      maxTop = Math.min(maxTop, bb.y);
+      maxBot = Math.max(maxBot, bb.y + bb.height);
+    }
+    totalW += spaceWidth * (words.length - 1);
 
-    const pad = Math.max(strokeWidth, fontSize * 0.12);
-    const box = { x: bbox.x - pad, y: bbox.y - pad, width: bbox.width + pad * 2, height: bbox.height + pad * 2 };
-    svg.setAttribute('viewBox', `${box.x} ${box.y} ${box.width} ${box.height}`);
-    host.style.setProperty('--stroke-title-w', box.width + 'px');
+    // Posicionar palabras una tras otra, centradas en x=0
+    let cursor = -totalW / 2;
+    words.forEach((wd, i) => {
+      const bb = metrics[i];
+      const tx = cursor - bb.x;
+      wd.gPos.setAttribute('transform', `translate(${tx},0)`);
+      // wipe cubre la caja de ESTA palabra
+      wd.box = { x: bb.x - strokeWidth, y: bb.y - strokeWidth, width: bb.width + strokeWidth * 2, height: bb.height + strokeWidth * 2 };
+      cursor += bb.width + spaceWidth;
+      positionMarbles(wd);
+    });
 
-    // Posicionar canicas sobre cada hueco "O"
-    positionMarbles();
+    const pad = Math.max(strokeWidth, fontSize * 0.14);
+    const vb = { x: -totalW / 2 - pad, y: maxTop - pad, width: totalW + pad * 2, height: (maxBot - maxTop) + pad * 2 };
+    svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.width} ${vb.height}`);
+    host.style.setProperty('--stroke-title-w', vb.width + 'px');
 
-    // Preparar y lanzar la animación
-    animate(box);
+    animate();
   };
 
-  function positionMarbles() {
-    marbleGroup.innerHTML = '';
-    marbleSlots.forEach((slot, idx) => {
+  function positionMarbles(wd) {
+    wd.marbleGroup.innerHTML = '';
+    wd.marbleSlots.forEach((slot, idx) => {
       let ext;
       try { ext = slot.tspan.getExtentOfChar(0); } catch (e) { return; }
-      // Centro y tamaño del glifo "O" en coordenadas SVG (robusto, sin px)
       const cx = ext.x + ext.width / 2;
       const cy = ext.y + ext.height / 2;
-      // La canica cubre el aro de la "O" de Righteous (redonda y ancha).
       const d = Math.min(ext.width * 1.05, ext.height * 0.9);
-      // Contenedor SVG que hospeda el SVG de la canica
       const wrap = document.createElementNS(SVGNS, 'svg');
-      wrap.setAttribute('class', 'stroke-title-marble-svg');
       wrap.setAttribute('x', cx - d / 2);
       wrap.setAttribute('y', cy - d / 2);
       wrap.setAttribute('width', d);
       wrap.setAttribute('height', d);
       wrap.setAttribute('viewBox', '0 0 100 100');
       wrap.setAttribute('overflow', 'visible');
-      wrap.innerHTML = (typeof svgMarble === 'function') ? svgMarble('tt' + idx) : '';
-      // el svg interno de svgMarble ya trae su propio viewBox 0 0 100 100
-      marbleGroup.appendChild(wrap);
+      wrap.innerHTML = (typeof svgMarble === 'function') ? svgMarble('tt' + Math.random().toString(36).slice(2, 6)) : '';
+      wd.marbleGroup.appendChild(wrap);
     });
   }
 
   let tl = null;
-  let drawnOnce = false;
+  let floatTweens = [];
 
-  function animate(box) {
-    if (typeof gsap === 'undefined') { // sin GSAP: mostrar estado final
-      finalState(box); return;
-    }
-    const strokes = Array.from(strokeText.querySelectorAll('[data-stroke-char]'));
-    const dash = Math.max(fontSize * 7, 200);
+  function animate() {
     const drawDuration = opts.drawDuration || 1.6;
     const fillDelay = opts.fillDelay != null ? opts.fillDelay : 0.2;
     const stagger = opts.stagger != null ? opts.stagger : 0.05;
     const ease = opts.ease || 'power3.out';
     const fillDuration = Math.max(0.4, drawDuration * 0.5);
+    const dash = Math.max(fontSize * 7, 200);
+
+    const allStrokes = [];
+    words.forEach(wd => { wd.strokes = Array.from(wd.strokeText.querySelectorAll('[data-stroke-char]')); allStrokes.push(...wd.strokes); });
 
     const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) { finalState(box); return; }
+
+    if (typeof gsap === 'undefined' || prefersReduced) { finalState(dash); startFloatCSS(); return; }
 
     const play = () => {
-      gsap.killTweensOf([...strokes, wipeRect, ...marbleGroup.children]);
-      gsap.set(strokes, { strokeDasharray: dash, strokeDashoffset: dash, strokeOpacity: 1 });
-      gsap.set(wipeRect, { attr: { x: box.x, y: box.y, width: 0, height: box.height } });
-      gsap.set(marbleGroup.children, { opacity: 0 });
+      stopFloat();
+      words.forEach(wd => {
+        wd.marbles = Array.from(wd.marbleGroup.children); // array real (no HTMLCollection)
+        if (wd.strokes.length) gsap.set(wd.strokes, { strokeDasharray: dash, strokeDashoffset: dash, strokeOpacity: 1 });
+        gsap.set(wd.wipeRect, { attr: { x: wd.box.x, y: wd.box.y, width: 0, height: wd.box.height } });
+        if (wd.marbles.length) gsap.set(wd.marbles, { opacity: 0 });
+      });
 
       tl = gsap.timeline({ onComplete: startFloat });
-      tl.to(strokes, { strokeDashoffset: 0, duration: drawDuration, ease, stagger }, 0);
-      tl.to(wipeRect, { attr: { width: box.width }, duration: fillDuration, ease: 'power2.inOut' }, drawDuration + fillDelay);
-      tl.to(marbleGroup.children, { opacity: 1, duration: 0.5, ease: 'power2.out', stagger: 0.08 }, drawDuration + fillDelay);
-      drawnOnce = true;
+      if (allStrokes.length) tl.to(allStrokes, { strokeDashoffset: 0, duration: drawDuration, ease, stagger }, 0);
+      words.forEach(wd => {
+        tl.to(wd.wipeRect, { attr: { width: wd.box.width }, duration: fillDuration, ease: 'power2.inOut' }, drawDuration + fillDelay);
+        if (wd.marbles.length) tl.to(wd.marbles, { opacity: 1, duration: 0.5, ease: 'power2.out' }, drawDuration + fillDelay);
+      });
     };
+    stopFloat();
     play();
 
-    // Redibujar al pasar el mouse (una vez completado el primer dibujo)
     if (opts.hoverRedraw !== false) {
       host.addEventListener('pointerenter', () => {
         if (!tl || tl.progress() < 1) return;
-        floatTweens.forEach(t => t.kill());
-        floatTweens = [];
         play();
       });
     }
-
-    // Flotación independiente por palabra: cada palabra se mueve con su
-    // propio ritmo, amplitud y rotación leve → se ve natural, no en bloque.
-    let floatTweens = [];
-    function startFloat() {
-      floatTweens.forEach(t => t.kill());
-      floatTweens = [];
-      TITLE_SEGMENTS.forEach((seg, w) => {
-        const textParts = [
-          ...fillText.querySelectorAll(`[data-word="${w}"]`),
-          ...strokeText.querySelectorAll(`[data-word="${w}"]`),
-        ];
-        const marbleParts = [];
-        marbleSlotWord.forEach((mw, mi) => {
-          if (mw === w && marbleGroup.children[mi]) marbleParts.push(marbleGroup.children[mi]);
-        });
-        if (!textParts.length && !marbleParts.length) return;
-
-        // Parámetros variados por palabra para un vaivén orgánico
-        const amp = 6 + (w % 2) * 3;              // amplitud 6–9 px
-        const dur = 2.4 + w * 0.35;               // duración distinta por palabra
-        const rot = (w % 2 === 0 ? 1 : -1) * (1.1 + (w % 3) * 0.35); // rotación leve alterna
-        const delay = w * 0.25;
-        const common = { duration: dur, delay, ease: 'sine.inOut', repeat: -1, yoyo: true };
-
-        // El TEXTO flota con desplazamiento + rotación leve
-        if (textParts.length) {
-          gsap.set(textParts, { transformBox: 'fill-box', transformOrigin: 'center' });
-          floatTweens.push(gsap.to(textParts, { y: -amp, rotation: rot, ...common }));
-        }
-        // Las CANICAS solo suben/bajan con su palabra (sin rotación) para
-        // mantenerse pegadas dentro del aro de la "O".
-        if (marbleParts.length) {
-          floatTweens.push(gsap.to(marbleParts, { y: -amp, ...common }));
-        }
-      });
-    }
   }
 
-  function finalState(box) {
-    const strokes = Array.from(strokeText.querySelectorAll('[data-stroke-char]'));
-    const dash = Math.max(fontSize * 7, 200);
-    if (typeof gsap !== 'undefined') {
-      gsap.set(strokes, { strokeDasharray: dash, strokeDashoffset: 0, strokeOpacity: 1 });
-      gsap.set(wipeRect, { attr: { x: box.x, y: box.y, width: box.width, height: box.height } });
-    } else {
-      wipeRect.setAttribute('x', box.x); wipeRect.setAttribute('y', box.y);
-      wipeRect.setAttribute('width', box.width); wipeRect.setAttribute('height', box.height);
-    }
-    // canicas visibles
-    Array.from(marbleGroup.children).forEach(c => { c.style.opacity = '1'; });
+  // Flotación por palabra con CSS puro (fiable en SVG): cada <g> recibe su
+  // propia animación con amplitud/duración/desfase distintos.
+  function startFloat() {
+    words.forEach((wd, w) => {
+      const dur = (2.3 + w * 0.4).toFixed(2);
+      const delay = (w * 0.3).toFixed(2);
+      const amp = 7 + (w % 2) * 4;
+      // Solo translateY vía atributo SVG (fiable en todos los navegadores).
+      wd.g.style.setProperty('--fl-amp', `-${amp}px`);
+      wd.g.style.animation = `wordFloatY ${dur}s ease-in-out ${delay}s infinite`;
+      wd.floating = true;
+    });
+  }
+  function stopFloat() {
+    words.forEach(wd => { if (wd.g) { wd.g.style.animation = 'none'; wd.floating = false; } });
+  }
+  const startFloatCSS = startFloat;
+
+  function finalState(dash) {
+    words.forEach(wd => {
+      const strokes = Array.from(wd.strokeText.querySelectorAll('[data-stroke-char]'));
+      if (typeof gsap !== 'undefined') {
+        gsap.set(strokes, { strokeDasharray: dash, strokeDashoffset: 0, strokeOpacity: 1 });
+        gsap.set(wd.wipeRect, { attr: { x: wd.box.x, y: wd.box.y, width: wd.box.width, height: wd.box.height } });
+      } else {
+        wd.wipeRect.setAttribute('x', wd.box.x); wd.wipeRect.setAttribute('y', wd.box.y);
+        wd.wipeRect.setAttribute('width', wd.box.width); wd.wipeRect.setAttribute('height', wd.box.height);
+      }
+      Array.from(wd.marbleGroup.children).forEach(c => { c.style.opacity = '1'; });
+    });
   }
 
-  // Esperar a que la fuente esté lista para medir bien
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => requestAnimationFrame(run)).catch(() => requestAnimationFrame(run));
   } else {
     requestAnimationFrame(run);
   }
-  // Reposicionar canicas si cambia el tamaño
+  // Reposicionar en resize, SIN reiniciar la animación/flotación (evita
+  // que el observer mate la flotación recién iniciada). Debounce + solo si
+  // cambió el ancho de forma relevante.
   if (typeof ResizeObserver !== 'undefined') {
-    const ro = new ResizeObserver(() => { try { positionMarbles(); } catch (e) {} });
+    let lastW = 0, roTimer = null;
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0] && entries[0].contentRect ? Math.round(entries[0].contentRect.width) : 0;
+      if (Math.abs(w - lastW) < 2) return;  // ignora micro-cambios
+      lastW = w;
+      clearTimeout(roTimer);
+      roTimer = setTimeout(() => { try { run(); } catch (e) {} }, 250);
+    });
     ro.observe(host);
   }
 
   return { replay: () => run() };
 }
 
-// Renderiza el título animado en todos los contenedores [data-stroke-title]
 function renderStrokeTitles() {
   document.querySelectorAll('[data-stroke-title]').forEach(host => {
     const fs = parseInt(host.getAttribute('data-title-fontsize') || '60', 10);
