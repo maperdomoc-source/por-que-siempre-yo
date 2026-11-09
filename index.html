@@ -23,6 +23,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <!-- GSAP para la animación del título (StrokeText) -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 
   <link rel="stylesheet" href="style.css">
 
@@ -46,7 +48,7 @@
 
     <div class="relative z-10 w-full max-w-md text-center flex flex-col items-center gap-5">
 
-      <h1 class="mega-title text-4xl sm:text-5xl" data-title data-title-size="0.85em"></h1>
+      <div class="w-full px-2" data-stroke-title data-title-fontsize="62"></div>
 
       <!-- Selección de modo -->
       <div class="w-full grid grid-cols-2 gap-3">
@@ -121,21 +123,23 @@
        ============================================================ -->
   <div id="gameScreen" class="hidden min-h-screen flex flex-col">
 
-    <header class="w-full px-4 py-2.5 flex items-center justify-between z-20" style="background:rgba(36,22,12,0.85);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,220,170,0.12)">
-      <h1 class="text-lg sm:text-2xl" data-title data-title-size="0.8em"></h1>
+    <header class="w-full px-4 pt-3 pb-1 flex items-center justify-between gap-3 z-20">
+      <!-- Título grande centrado, sin barra de fondo -->
+      <div class="flex-1 min-w-0" data-stroke-title data-title-fontsize="52"></div>
 
-      <div class="flex items-center gap-2">
-        <div id="onlineBadge" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-sans" style="background:rgba(36,22,12,0.7);border:1px solid rgba(255,220,170,0.12)">
+      <!-- Botones flotantes discretos -->
+      <div class="flex items-center gap-2 shrink-0">
+        <div id="onlineBadge" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-sans" style="background:rgba(36,22,12,0.6)">
           <span id="onlineDot" class="w-2.5 h-2.5 rounded-full animate-pulse" style="background:#8bd48b"></span>
           <span id="onlineText" class="font-bold" style="color:#e9d9b6">Online</span>
         </div>
-        <button onclick="toggleSound()" title="Sonido" class="lift w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(90,58,34,0.85);color:#e9d9b6;border:1px solid rgba(255,220,170,0.12)">
+        <button onclick="toggleSound()" title="Sonido" class="lift w-9 h-9 rounded-xl flex items-center justify-center" style="color:#e9d9b6">
           <i id="soundIcon" class="fa-solid fa-volume-high"></i>
         </button>
-        <button onclick="openRulesModal()" title="Reglas" class="lift w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(90,58,34,0.85);color:var(--col-yellow);border:1px solid rgba(255,220,170,0.12)">
+        <button onclick="openRulesModal()" title="Reglas" class="lift w-9 h-9 rounded-xl flex items-center justify-center" style="color:var(--col-yellow)">
           <i class="fa-solid fa-circle-question"></i>
         </button>
-        <button onclick="handleQuit()" title="Salir" class="lift w-10 h-10 rounded-xl flex items-center justify-center text-white" style="background:rgba(216,35,42,0.75);border:1px solid rgba(255,220,170,0.12)">
+        <button onclick="handleQuit()" title="Salir" class="lift w-9 h-9 rounded-xl flex items-center justify-center" style="color:#e44c50">
           <i class="fa-solid fa-door-open"></i>
         </button>
       </div>
@@ -285,8 +289,9 @@
     </div>
   </div>
 
-  <!-- Assets gráficos (SVG) + lógica -->
+  <!-- Assets gráficos (SVG) + título animado + lógica -->
   <script src="assets.js"></script>
+  <script src="stroketext.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

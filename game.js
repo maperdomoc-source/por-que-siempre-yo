@@ -142,6 +142,12 @@ function showScreen(name) {
   if (name === 'start') start.classList.remove('hidden');
   if (name === 'game')  game.classList.remove('hidden');
   if (name === 'end')   end.classList.remove('hidden');
+
+  // El título animado necesita medirse cuando su pantalla ya es visible
+  // (getBBox no funciona con display:none). Lo (re)dibujamos al mostrar.
+  if (typeof renderStrokeTitles === 'function') {
+    requestAnimationFrame(() => renderStrokeTitles());
+  }
 }
 
 // Generar canicas flotantes decorativas en las pantallas
@@ -195,8 +201,8 @@ window.addEventListener('DOMContentLoaded', () => {
   document.body.addEventListener('touchstart', unlockAudio);
   document.body.addEventListener('click', unlockAudio);
 
-  // Renderizar el título tricolor con canicas en las "O"
-  renderTitles();
+  // Renderizar el título animado (StrokeText) con canicas en las "O"
+  if (typeof renderStrokeTitles === 'function') renderStrokeTitles();
 
   // Restaurar nombre de usuario guardado (se comparte entre 1vsBOT y Online)
   const savedName = localStorage.getItem('pqsy_name');
@@ -221,29 +227,6 @@ window.addEventListener('DOMContentLoaded', () => {
   // Activar "agitar para girar el dado" en móviles
   setupShakeToRoll();
 });
-
-// ============================================================
-//  TÍTULO TRICOLOR (con canica incrustada en las "O")
-// ============================================================
-// Construye: ¿P[O]R QUÉ SIEMPRE Y[O]?  — rojo / azul / amarillo,
-// con una mini canica tricolor reemplazando cada "O".
-function titleHTML(marbleSize) {
-  const o = `<span class="title-o" style="width:${marbleSize};height:${marbleSize}">${(typeof svgMarble==='function')?svgMarble('t'+Math.random().toString(36).slice(2,6)):''}</span>`;
-  return `
-    <span class="title-wrap">
-      <span class="title-word tw-red">¿P${o}R</span>
-      <span class="title-word tw-red">QUÉ</span>
-      <span class="title-word tw-blue">SIEMPRE</span>
-      <span class="title-word tw-yellow">Y${o}?</span>
-    </span>`;
-}
-
-function renderTitles() {
-  document.querySelectorAll('[data-title]').forEach(el => {
-    const size = el.getAttribute('data-title-size') || '0.9em';
-    el.innerHTML = titleHTML(size);
-  });
-}
 
 // ============================================================
 //  AGITAR PARA GIRAR EL DADO (móvil) + vibración

@@ -189,7 +189,35 @@ body, .screen-overlay, #gameScreen {
 .animate-drop-six { animation: dropIntoSix 0.7s ease-in forwards; }
 
 /* ============================================================
-   TÍTULO TRICOLOR + canica en las "O"
+   TÍTULO ANIMADO (StrokeText) — contenedor + canicas en las "O"
+   ============================================================ */
+.stroke-title-host {
+  position: relative;
+  display: block;
+  width: 100%;
+  line-height: 0;
+}
+.stroke-title-svg {
+  display: block;
+  width: 100%;
+  max-width: var(--stroke-title-w, 700px);
+  height: auto;
+  margin: 0 auto;
+  overflow: visible;
+}
+.stroke-title-marbles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.stroke-title-marble {
+  position: absolute;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4));
+}
+.stroke-title-marble svg { width: 100%; height: 100%; display: block; }
+
+/* ============================================================
+   TÍTULO TRICOLOR + canica en las "O" (versión estática, legacy)
    ============================================================ */
 .title-wrap { display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.1em; line-height: 1; }
 .title-word { font-family: 'Righteous', cursive; text-shadow: 2px 4px 0 rgba(0,0,0,0.45); }
