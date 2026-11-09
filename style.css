@@ -196,6 +196,18 @@ body, .screen-overlay, #gameScreen {
   display: block;
   width: 100%;
   line-height: 0;
+  /* El título flota suavemente siempre, incluso tras la animación de dibujo */
+  animation: titleFloat 3.6s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes titleFloat {
+  0%, 100% { transform: translateY(0)     rotate(-0.6deg); }
+  50%      { transform: translateY(-10px) rotate(0.6deg);  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stroke-title-host { animation: none; }
 }
 .stroke-title-svg {
   display: block;

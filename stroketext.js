@@ -24,10 +24,10 @@ const SIGN_COLOR = '#ebc254';
 /* Construye un <span> con el SVG del título animado dentro de `host`. */
 function buildStrokeTitle(host, opts = {}) {
   const fontSize = opts.fontSize || 60;
-  const fontWeight = opts.fontWeight || 700;        // Caveat llega hasta 700
-  const letterSpacing = opts.letterSpacing != null ? opts.letterSpacing : 1;
+  const fontWeight = opts.fontWeight || 800;
+  const letterSpacing = opts.letterSpacing != null ? opts.letterSpacing : -1;
   const strokeColor = opts.strokeColor || 'rgba(255,255,255,0.55)';
-  const strokeWidth = opts.strokeWidth != null ? opts.strokeWidth : Math.max(fontSize * 0.045, 3); // grosor para engordar la fuente
+  const strokeWidth = opts.strokeWidth != null ? opts.strokeWidth : Math.max(fontSize * 0.04, 2.5); // grosor para engordar la fuente
 
   host.innerHTML = '';
   host.classList.add('stroke-title-host');
@@ -43,8 +43,9 @@ function buildStrokeTitle(host, opts = {}) {
   const defs = document.createElementNS(SVGNS, 'defs');
   svg.appendChild(defs);
 
-  // Fuente del título: Caveat (manuscrita) en MAYÚSCULAS, bien gruesa.
-  const fontStyle = `font-family:'Caveat',cursive;font-size:${fontSize}px;font-weight:${fontWeight};letter-spacing:${letterSpacing}px;text-transform:uppercase;`;
+  // Fuente del título: Righteous (la original del prompt de React Bits,
+  // que hereda la tipografía display de la app).
+  const fontStyle = `font-family:'Righteous',cursive;font-size:${fontSize}px;font-weight:${fontWeight};letter-spacing:${letterSpacing}px;`;
 
   // Grupo de relleno (texto con color, revelado por wipe).
   // Añadimos un stroke del MISMO color que el relleno para engrosar la fuente.
@@ -160,9 +161,8 @@ function buildStrokeTitle(host, opts = {}) {
       // Centro y tamaño del glifo "O" en coordenadas SVG (robusto, sin px)
       const cx = ext.x + ext.width / 2;
       const cy = ext.y + ext.height / 2;
-      // La canica cubre el aro de la "O". En fuentes manuscritas la "O" es
-      // más estrecha, así que la basamos en el alto del glifo.
-      const d = ext.height * 0.9;
+      // La canica cubre el aro de la "O" de Righteous (redonda y ancha).
+      const d = Math.min(ext.width * 1.05, ext.height * 0.9);
       // Contenedor SVG que hospeda el SVG de la canica
       const wrap = document.createElementNS(SVGNS, 'svg');
       wrap.setAttribute('class', 'stroke-title-marble-svg');
