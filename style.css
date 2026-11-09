@@ -15,15 +15,12 @@
   --cream:      #f3ead6;
 }
 
-/* Fondo general tipo madera con textura de puntitos (como el mockup) */
+/* Fondo uniforme en TODAS las pantallas + textura de puntitos sutil */
 body, .screen-overlay, #gameScreen {
-  background-color: #2a1a10;
+  background-color: #271606;
   background-image:
-    radial-gradient(rgba(255, 255, 255, 0.04) 1.3px, transparent 1.3px),
-    radial-gradient(circle at 15% 15%, rgba(255, 205, 0, 0.06), transparent 45%),
-    radial-gradient(circle at 85% 85%, rgba(11, 63, 174, 0.06), transparent 45%),
-    linear-gradient(160deg, #3a2416, #241209 70%);
-  background-size: 22px 22px, 100% 100%, 100% 100%, 100% 100%;
+    radial-gradient(rgba(255, 255, 255, 0.04) 1.3px, transparent 1.3px);
+  background-size: 22px 22px;
 }
 
 /* ============================================================
