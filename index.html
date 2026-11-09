@@ -18,7 +18,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Outfit:wght@400;600;800&family=Righteous&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Fredoka:wght@400;600;700&family=Outfit:wght@400;600;800&family=Righteous&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -46,73 +46,74 @@
   <div id="startScreen" class="screen-overlay">
     <div id="startFloaties" class="absolute inset-0 overflow-hidden"></div>
 
-    <div class="relative z-10 w-full max-w-md text-center flex flex-col items-center gap-5">
+    <div class="relative z-10 w-full max-w-sm text-center flex flex-col items-center gap-3">
 
-      <div class="w-full px-2" data-stroke-title data-title-fontsize="62"></div>
+      <!-- Título GRANDE y centrado (más ancho que el resto del formulario) -->
+      <div class="w-screen max-w-2xl px-4" data-stroke-title data-title-fontsize="150"></div>
 
-      <!-- Selección de modo -->
-      <div class="w-full grid grid-cols-2 gap-3">
-        <button id="modeLocalBtn" onclick="selectMode('local')" class="chip chip-active lift py-5 rounded-2xl flex flex-col items-center gap-2">
-          <i class="fa-solid fa-robot text-3xl" style="color:var(--col-yellow)"></i>
-          <span class="font-display text-lg">1 vs BOT</span>
+      <!-- Selección de modo (compacto) -->
+      <div class="w-full grid grid-cols-2 gap-2.5">
+        <button id="modeLocalBtn" onclick="selectMode('local')" class="chip chip-active lift py-3 rounded-2xl flex flex-col items-center gap-1">
+          <i class="fa-solid fa-robot text-2xl" style="color:var(--col-yellow)"></i>
+          <span class="font-display text-base">1 vs BOT</span>
         </button>
-        <button id="modeOnlineBtn" onclick="selectMode('online')" class="chip lift py-5 rounded-2xl flex flex-col items-center gap-2">
-          <i class="fa-solid fa-globe text-3xl" style="color:var(--col-blue)"></i>
-          <span class="font-display text-lg">Online</span>
+        <button id="modeOnlineBtn" onclick="selectMode('online')" class="chip lift py-3 rounded-2xl flex flex-col items-center gap-1">
+          <i class="fa-solid fa-globe text-2xl" style="color:var(--col-blue)"></i>
+          <span class="font-display text-base">Online</span>
         </button>
       </div>
 
-      <!-- Config LOCAL -->
-      <div id="localConfig" class="panel-card w-full rounded-3xl p-5 space-y-4 font-sans">
+      <!-- Config LOCAL (compacto) -->
+      <div id="localConfig" class="panel-card w-full rounded-2xl p-4 space-y-3 font-sans">
         <div>
-          <label class="block text-sm font-bold mb-2" style="color:#e9d9b6">Tu nombre</label>
-          <input type="text" id="localPlayerName" value="Tú" class="col-input w-full rounded-xl px-4 py-3 text-base">
+          <label class="block text-sm font-bold mb-1.5" style="color:#e9d9b6">Tu nombre</label>
+          <input type="text" id="localPlayerName" value="Tú" class="col-input w-full rounded-xl px-4 py-2.5 text-base">
         </div>
         <div>
-          <label class="block text-sm font-bold mb-2" style="color:#e9d9b6">Canicas por jugador</label>
+          <label class="block text-sm font-bold mb-1.5" style="color:#e9d9b6">Canicas por jugador</label>
           <div class="grid grid-cols-4 gap-2">
-            <button id="mb4"  onclick="setMarbleCount(4)"  class="chip py-3 rounded-xl font-bold text-base">4</button>
-            <button id="mb6"  onclick="setMarbleCount(6)"  class="chip py-3 rounded-xl font-bold text-base">6</button>
-            <button id="mb8"  onclick="setMarbleCount(8)"  class="chip py-3 rounded-xl font-bold text-base">8</button>
-            <button id="mb10" onclick="setMarbleCount(10)" class="chip py-3 rounded-xl font-bold text-base">10</button>
+            <button id="mb4"  onclick="setMarbleCount(4)"  class="chip py-2.5 rounded-xl font-bold text-base">4</button>
+            <button id="mb6"  onclick="setMarbleCount(6)"  class="chip py-2.5 rounded-xl font-bold text-base">6</button>
+            <button id="mb8"  onclick="setMarbleCount(8)"  class="chip py-2.5 rounded-xl font-bold text-base">8</button>
+            <button id="mb10" onclick="setMarbleCount(10)" class="chip py-2.5 rounded-xl font-bold text-base">10</button>
           </div>
         </div>
-        <button onclick="startLocalGame()" class="btn-primary lift w-full py-4 rounded-2xl text-xl">¡JUGAR CONTRA EL BOT!</button>
+        <button onclick="startLocalGame()" class="btn-primary lift w-full py-3 rounded-2xl text-lg">¡JUGAR CONTRA EL BOT!</button>
       </div>
 
-      <!-- Config ONLINE -->
-      <div id="onlineConfig" class="panel-card w-full rounded-3xl p-5 space-y-4 font-sans hidden">
+      <!-- Config ONLINE (compacto) -->
+      <div id="onlineConfig" class="panel-card w-full rounded-2xl p-4 space-y-3 font-sans hidden">
         <div>
-          <label class="block text-sm font-bold mb-2" style="color:#e9d9b6">Tu nombre</label>
-          <input type="text" id="onlineNickname" value="Jugador" class="col-input w-full rounded-xl px-4 py-3 text-base">
+          <label class="block text-sm font-bold mb-1.5" style="color:#e9d9b6">Tu nombre</label>
+          <input type="text" id="onlineNickname" value="Jugador" class="col-input w-full rounded-xl px-4 py-2.5 text-base">
         </div>
 
-        <div class="grid grid-cols-1 gap-3">
-          <div class="rounded-2xl p-4 space-y-2" style="background:rgba(36,22,12,0.55);border:1px solid rgba(255,220,170,0.12)">
+        <div class="grid grid-cols-1 gap-2.5">
+          <div class="rounded-2xl p-3 space-y-2" style="background:rgba(36,22,12,0.55);border:1px solid rgba(255,220,170,0.12)">
             <h3 class="font-bold text-base" style="color:var(--col-yellow)">Crear sala (Anfitrión)</h3>
-            <button onclick="createOnlineRoom()" id="btnCreateRoom" class="btn-primary lift w-full py-3 rounded-xl font-bold text-base">Crear sala</button>
+            <button onclick="createOnlineRoom()" id="btnCreateRoom" class="btn-primary lift w-full py-2.5 rounded-xl font-bold text-base">Crear sala</button>
           </div>
 
-          <div class="rounded-2xl p-4 space-y-2" style="background:rgba(36,22,12,0.55);border:1px solid rgba(255,220,170,0.12)">
+          <div class="rounded-2xl p-3 space-y-2" style="background:rgba(36,22,12,0.55);border:1px solid rgba(255,220,170,0.12)">
             <h3 class="font-bold text-base" style="color:#6ea8ff">Unirme a una sala</h3>
             <input type="text" id="joinRoomCodeInput" placeholder="EJ: X8KA" maxlength="6" class="col-input w-full rounded-lg px-3 py-2 text-center font-mono text-lg uppercase" style="color:var(--col-yellow)">
-            <button onclick="joinOnlineRoom()" id="btnJoinRoom" class="btn-blue lift w-full py-3 rounded-xl font-bold text-base">Unirse</button>
+            <button onclick="joinOnlineRoom()" id="btnJoinRoom" class="btn-blue lift w-full py-2.5 rounded-xl font-bold text-base">Unirse</button>
           </div>
         </div>
 
         <!-- Código de sala (host) -->
-        <div id="roomCodeDisplay" class="hidden rounded-2xl p-4 text-center space-y-2" style="background:rgba(36,22,12,0.85);border:1px solid rgba(255,205,0,0.35)">
+        <div id="roomCodeDisplay" class="hidden rounded-2xl p-3 text-center space-y-2" style="background:rgba(36,22,12,0.85);border:1px solid rgba(255,205,0,0.35)">
           <span class="text-sm" style="color:#e9d9b6">Código de sala (compártelo):</span>
           <div class="flex items-center justify-center gap-2">
             <span id="roomCodeText" class="font-mono font-extrabold text-3xl tracking-widest" style="color:var(--col-yellow)">----</span>
             <button onclick="copyRoomCode()" class="lift p-2 rounded-lg text-base" style="background:rgba(90,58,34,0.9);color:#e9d9b6"><i class="fa-solid fa-copy"></i></button>
           </div>
           <p id="roomConnectedCount" class="text-sm font-bold" style="color:#8bd48b">Conectados: 1</p>
-          <button id="btnStartOnlineGame" onclick="startHostOnlineGame()" class="btn-red lift w-full py-3 mt-1 rounded-xl font-bold text-base">Iniciar partida</button>
+          <button id="btnStartOnlineGame" onclick="startHostOnlineGame()" class="btn-red lift w-full py-2.5 mt-1 rounded-xl font-bold text-base">Iniciar partida</button>
         </div>
       </div>
 
-      <button onclick="openRulesModal()" class="lift font-sans text-base flex items-center gap-2" style="color:#e9d9b6">
+      <button onclick="openRulesModal()" class="lift font-sans text-sm flex items-center gap-2" style="color:#e9d9b6">
         <i class="fa-solid fa-circle-question" style="color:var(--col-yellow)"></i> Ver reglas
       </button>
     </div>
@@ -123,12 +124,12 @@
        ============================================================ -->
   <div id="gameScreen" class="hidden min-h-screen flex flex-col">
 
-    <header class="w-full px-4 pt-3 pb-1 flex items-center justify-between gap-3 z-20">
-      <!-- Título grande centrado, sin barra de fondo -->
-      <div class="flex-1 min-w-0" data-stroke-title data-title-fontsize="52"></div>
+    <header class="w-full px-4 pt-3 pb-1 relative z-20">
+      <!-- Título grande y COMPLETAMENTE centrado (los botones flotan aparte) -->
+      <div class="w-full max-w-2xl mx-auto px-2" data-stroke-title data-title-fontsize="120"></div>
 
-      <!-- Botones flotantes discretos -->
-      <div class="flex items-center gap-2 shrink-0">
+      <!-- Botones flotantes en la esquina, sin empujar el título -->
+      <div class="absolute top-3 right-4 flex items-center gap-2">
         <div id="onlineBadge" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-sans" style="background:rgba(36,22,12,0.6)">
           <span id="onlineDot" class="w-2.5 h-2.5 rounded-full animate-pulse" style="background:#8bd48b"></span>
           <span id="onlineText" class="font-bold" style="color:#e9d9b6">Online</span>

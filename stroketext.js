@@ -24,10 +24,10 @@ const SIGN_COLOR = '#ebc254';
 /* Construye un <span> con el SVG del título animado dentro de `host`. */
 function buildStrokeTitle(host, opts = {}) {
   const fontSize = opts.fontSize || 60;
-  const fontWeight = opts.fontWeight || 800;
-  const letterSpacing = opts.letterSpacing != null ? opts.letterSpacing : -1;
+  const fontWeight = opts.fontWeight || 700;        // Caveat llega hasta 700
+  const letterSpacing = opts.letterSpacing != null ? opts.letterSpacing : 1;
   const strokeColor = opts.strokeColor || 'rgba(255,255,255,0.55)';
-  const strokeWidth = opts.strokeWidth || 1.2;
+  const strokeWidth = opts.strokeWidth != null ? opts.strokeWidth : Math.max(fontSize * 0.045, 3); // grosor para engordar la fuente
 
   host.innerHTML = '';
   host.classList.add('stroke-title-host');
@@ -43,21 +43,25 @@ function buildStrokeTitle(host, opts = {}) {
   const defs = document.createElementNS(SVGNS, 'defs');
   svg.appendChild(defs);
 
-  // Capa de texto (medición). Construimos un único <text> con tspans por
-  // caracter, coloreando por palabra y dejando hueco para las canicas.
-  const fontStyle = `font-family:'Righteous',cursive;font-size:${fontSize}px;font-weight:${fontWeight};letter-spacing:${letterSpacing}px;`;
+  // Fuente del título: Caveat (manuscrita) en MAYÚSCULAS, bien gruesa.
+  const fontStyle = `font-family:'Caveat',cursive;font-size:${fontSize}px;font-weight:${fontWeight};letter-spacing:${letterSpacing}px;text-transform:uppercase;`;
 
-  // Grupo de relleno (texto con color, revelado por wipe)
+  // Grupo de relleno (texto con color, revelado por wipe).
+  // Añadimos un stroke del MISMO color que el relleno para engrosar la fuente.
   const fillText = document.createElementNS(SVGNS, 'text');
   fillText.setAttribute('x', '0'); fillText.setAttribute('y', '0');
-  fillText.setAttribute('stroke', 'none');
+  fillText.setAttribute('stroke-width', strokeWidth);
+  fillText.setAttribute('stroke-linejoin', 'round');
+  fillText.setAttribute('stroke-linecap', 'round');
+  fillText.setAttribute('paint-order', 'stroke');
   fillText.setAttribute('style', fontStyle);
 
-  // Grupo de contorno (se dibuja con dashoffset)
+  // Grupo de contorno (se dibuja con dashoffset). El color del trazo coincide
+  // con el color de cada palabra (asignado por tspan) para que NO se vea una
+  // línea de otro color: el borde es del mismo color que la letra.
   const strokeText = document.createElementNS(SVGNS, 'text');
   strokeText.setAttribute('x', '0'); strokeText.setAttribute('y', '0');
   strokeText.setAttribute('fill', 'none');
-  strokeText.setAttribute('stroke', strokeColor);
   strokeText.setAttribute('stroke-width', strokeWidth);
   strokeText.setAttribute('stroke-linejoin', 'round');
   strokeText.setAttribute('stroke-linecap', 'round');
@@ -90,11 +94,13 @@ function buildStrokeTitle(host, opts = {}) {
       } else {
         const t = document.createElementNS(SVGNS, 'tspan');
         t.setAttribute('fill', color);
+        t.setAttribute('stroke', color);     // mismo color → engrosa sin verse borde
         t.setAttribute('data-fill-char', '1');
         t.textContent = ch;
         fillText.appendChild(t);
 
         const ts = document.createElementNS(SVGNS, 'tspan');
+        ts.setAttribute('stroke', color);    // contorno del MISMO color de la palabra
         ts.setAttribute('data-stroke-char', '1');
         ts.textContent = ch;
         strokeText.appendChild(ts);
@@ -154,9 +160,9 @@ function buildStrokeTitle(host, opts = {}) {
       // Centro y tamaño del glifo "O" en coordenadas SVG (robusto, sin px)
       const cx = ext.x + ext.width / 2;
       const cy = ext.y + ext.height / 2;
-      // La canica ocupa el ancho del glifo "O" (algo menor que su alto) para
-      // encajar dentro del aro sin invadir las letras vecinas.
-      const d = Math.min(ext.width * 1.02, ext.height * 0.82);
+      // La canica cubre el aro de la "O". En fuentes manuscritas la "O" es
+      // más estrecha, así que la basamos en el alto del glifo.
+      const d = ext.height * 0.9;
       // Contenedor SVG que hospeda el SVG de la canica
       const wrap = document.createElementNS(SVGNS, 'svg');
       wrap.setAttribute('class', 'stroke-title-marble-svg');
