@@ -71,7 +71,9 @@ function buildStrokeTitle(host, opts = {}) {
   // Posiciones de canica (en coordenadas de glifo) las calculamos tras medir
   const marbleSlots = []; // { tspan, color }
 
-  // Construir tspans palabra por palabra
+  // Construir tspans palabra por palabra. Marcamos cada tspan con data-word
+  // = índice de palabra, para poder flotarla de forma independiente.
+  const marbleSlotWord = []; // palabra de cada canica, para flotar con su palabra
   TITLE_SEGMENTS.forEach((seg, segIdx) => {
     const chars = Array.from(seg.text);
     chars.forEach((ch, i) => {
@@ -79,35 +81,38 @@ function buildStrokeTitle(host, opts = {}) {
       const color = isSign ? SIGN_COLOR : seg.color;
 
       if (ch === '⊙') {
-        // Hueco para canica: un tspan espaciador invisible del ancho de una "O"
         const sp = document.createElementNS(SVGNS, 'tspan');
         sp.setAttribute('fill', 'transparent');
         sp.setAttribute('stroke', 'none');
+        sp.setAttribute('data-word', segIdx);
         sp.textContent = 'O';
         sp.setAttribute('data-marble', '1');
         fillText.appendChild(sp);
 
         const sp2 = document.createElementNS(SVGNS, 'tspan');
         sp2.setAttribute('stroke', 'none');
+        sp2.setAttribute('data-word', segIdx);
         sp2.textContent = 'O';
-        strokeText.appendChild(sp2); // en contorno dejamos la O (se dibuja) para forma; luego la tapamos con canica
+        strokeText.appendChild(sp2);
         marbleSlots.push({ tspan: sp });
+        marbleSlotWord.push(segIdx);
       } else {
         const t = document.createElementNS(SVGNS, 'tspan');
         t.setAttribute('fill', color);
-        t.setAttribute('stroke', color);     // mismo color → engrosa sin verse borde
+        t.setAttribute('stroke', color);
         t.setAttribute('data-fill-char', '1');
+        t.setAttribute('data-word', segIdx);
         t.textContent = ch;
         fillText.appendChild(t);
 
         const ts = document.createElementNS(SVGNS, 'tspan');
-        ts.setAttribute('stroke', color);    // contorno del MISMO color de la palabra
+        ts.setAttribute('stroke', color);
         ts.setAttribute('data-stroke-char', '1');
+        ts.setAttribute('data-word', segIdx);
         ts.textContent = ch;
         strokeText.appendChild(ts);
       }
     });
-    // Espacio entre palabras (excepto la última)
     if (segIdx < TITLE_SEGMENTS.length - 1) {
       [fillText, strokeText].forEach(parent => {
         const sp = document.createElementNS(SVGNS, 'tspan');
@@ -202,7 +207,7 @@ function buildStrokeTitle(host, opts = {}) {
       gsap.set(wipeRect, { attr: { x: box.x, y: box.y, width: 0, height: box.height } });
       gsap.set(marbleGroup.children, { opacity: 0 });
 
-      tl = gsap.timeline();
+      tl = gsap.timeline({ onComplete: startFloat });
       tl.to(strokes, { strokeDashoffset: 0, duration: drawDuration, ease, stagger }, 0);
       tl.to(wipeRect, { attr: { width: box.width }, duration: fillDuration, ease: 'power2.inOut' }, drawDuration + fillDelay);
       tl.to(marbleGroup.children, { opacity: 1, duration: 0.5, ease: 'power2.out', stagger: 0.08 }, drawDuration + fillDelay);
@@ -214,7 +219,46 @@ function buildStrokeTitle(host, opts = {}) {
     if (opts.hoverRedraw !== false) {
       host.addEventListener('pointerenter', () => {
         if (!tl || tl.progress() < 1) return;
+        floatTweens.forEach(t => t.kill());
+        floatTweens = [];
         play();
+      });
+    }
+
+    // Flotación independiente por palabra: cada palabra se mueve con su
+    // propio ritmo, amplitud y rotación leve → se ve natural, no en bloque.
+    let floatTweens = [];
+    function startFloat() {
+      floatTweens.forEach(t => t.kill());
+      floatTweens = [];
+      TITLE_SEGMENTS.forEach((seg, w) => {
+        const textParts = [
+          ...fillText.querySelectorAll(`[data-word="${w}"]`),
+          ...strokeText.querySelectorAll(`[data-word="${w}"]`),
+        ];
+        const marbleParts = [];
+        marbleSlotWord.forEach((mw, mi) => {
+          if (mw === w && marbleGroup.children[mi]) marbleParts.push(marbleGroup.children[mi]);
+        });
+        if (!textParts.length && !marbleParts.length) return;
+
+        // Parámetros variados por palabra para un vaivén orgánico
+        const amp = 6 + (w % 2) * 3;              // amplitud 6–9 px
+        const dur = 2.4 + w * 0.35;               // duración distinta por palabra
+        const rot = (w % 2 === 0 ? 1 : -1) * (1.1 + (w % 3) * 0.35); // rotación leve alterna
+        const delay = w * 0.25;
+        const common = { duration: dur, delay, ease: 'sine.inOut', repeat: -1, yoyo: true };
+
+        // El TEXTO flota con desplazamiento + rotación leve
+        if (textParts.length) {
+          gsap.set(textParts, { transformBox: 'fill-box', transformOrigin: 'center' });
+          floatTweens.push(gsap.to(textParts, { y: -amp, rotation: rot, ...common }));
+        }
+        // Las CANICAS solo suben/bajan con su palabra (sin rotación) para
+        // mantenerse pegadas dentro del aro de la "O".
+        if (marbleParts.length) {
+          floatTweens.push(gsap.to(marbleParts, { y: -amp, ...common }));
+        }
       });
     }
   }
