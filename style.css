@@ -308,6 +308,25 @@ body, .screen-overlay, #gameScreen {
   box-shadow: 0 12px 30px -8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,220,170,0.15);
 }
 
+/* Canicas de las tarjetas de jugador: giro leve y continuo */
+.gs-marble {
+  display: inline-flex;
+  animation: marbleWobble 3s ease-in-out infinite;
+  transform-origin: center;
+}
+.gs-marble .marble { animation: marbleSpin 6s linear infinite; }
+@keyframes marbleWobble {
+  0%, 100% { transform: translateY(0)    rotate(-6deg); }
+  50%      { transform: translateY(-2px) rotate(6deg);  }
+}
+@keyframes marbleSpin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gs-marble, .gs-marble .marble { animation: none !important; }
+}
+
 /* ============================================================
    INTERACTIVIDAD — hover lift global (estilo "Para Nice")
    ============================================================ */

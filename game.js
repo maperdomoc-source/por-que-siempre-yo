@@ -378,7 +378,9 @@ function renderPlayersPanel() {
 
     let marblesHtml = '';
     for (let m = 0; m < p.marbles; m++) {
-      marblesHtml += marbleHTML(p, 'w-4 h-4');
+      // Cada canica gira levemente, con un desfase distinto para que no vayan iguales
+      const delay = (m * 0.18).toFixed(2);
+      marblesHtml += `<span class="gs-marble" style="animation-delay:${delay}s">${marbleHTML(p, 'w-7 h-7')}</span>`;
     }
 
     card.innerHTML = `
@@ -386,17 +388,12 @@ function renderPlayersPanel() {
         <div class="flex items-center gap-2">
           ${marbleHTML(p, 'w-5 h-5')}
           <span class="font-display text-base text-white truncate max-w-[110px]">${p.name}</span>
-          ${p.isBot ? '<span class="text-xs px-2 py-0.5 rounded font-sans text-white" style="background:rgba(216,35,42,0.3)">BOT</span>' : ''}
+          ${p.isBot ? '<span class="text-xs px-2 py-0.5 rounded font-sans text-white" style="background:rgba(228,76,80,0.35)">BOT</span>' : ''}
         </div>
         ${isCurrent ? `<span class="w-2.5 h-2.5 rounded-full animate-ping" style="background:${p.style.ring}"></span>` : ''}
       </div>
-      <div class="flex flex-col gap-1">
-        <div class="flex items-center text-sm font-sans" style="color:#e9d9b6">
-          <span>Canicas: <strong class="text-white">${p.marbles}</strong></span>
-        </div>
-        <div class="flex flex-wrap gap-1 items-center min-h-[20px]">
-          ${p.marbles === 0 ? '<span class="text-sm font-bold" style="color:#ffcd00">¡Sin canicas! 🎉</span>' : marblesHtml}
-        </div>
+      <div class="flex flex-wrap gap-1.5 items-center min-h-[30px]">
+        ${p.marbles === 0 ? '<span class="text-sm font-bold" style="color:var(--col-yellow)">¡Sin canicas! 🎉</span>' : marblesHtml}
       </div>
     `;
     panel.appendChild(card);
