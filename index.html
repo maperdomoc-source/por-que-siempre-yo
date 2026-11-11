@@ -269,30 +269,35 @@
   <!-- ============================================================
        MODAL DE REGLAS
        ============================================================ -->
-  <div id="rulesModal" class="fixed inset-0 z-[70] hidden flex items-center justify-center p-4" style="background:rgba(0,0,0,0.8);backdrop-filter:blur(8px)">
-    <div class="panel-card rounded-3xl p-6 max-w-md w-full space-y-4 font-sans">
-      <div class="flex items-center justify-between pb-3" style="border-bottom:1px solid rgba(255,220,170,0.15)">
+  <div id="rulesModal" class="fixed inset-0 z-[70] hidden flex items-center justify-center p-4" style="background:rgba(0,0,0,0.85);backdrop-filter:blur(8px)">
+    <div class="panel-card rounded-3xl p-6 max-w-md w-full flex flex-col font-sans" style="max-height:88vh">
+      <div class="flex items-center justify-between pb-3 shrink-0" style="border-bottom:1px solid rgba(255,220,170,0.15)">
         <h3 class="font-display text-2xl" style="color:var(--col-yellow)">Reglas del juego</h3>
         <button onclick="closeRulesModal()" class="lift p-1" style="color:#e9d9b6"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
-      <div class="space-y-3 text-base leading-relaxed max-h-80 overflow-y-auto pr-2" style="color:#e9d9b6">
-        <p><strong style="color:var(--col-yellow)">Objetivo:</strong> ser el primer jugador en quedarse con <strong>0 CANICAS</strong>.</p>
-        <ul class="list-disc list-inside space-y-2">
-          <li>El tablero tiene 6 hoyos. Los hoyos <strong>1, 2, 3, 4 y 5</strong> sostienen canicas. El hoyo <strong>6</strong> es un pozo profundo.</li>
-          <li>En tu turno, lanzas el dado. <strong>Debes hacer clic en la casilla indicada por el dado.</strong></li>
-          <li style="color:#e44c50"><strong>¡Cuidado!</strong> Si haces clic en la casilla equivocada, recibes <strong>+1 canica de castigo</strong> y tu turno termina.</li>
-          <li><strong>Si sale 6:</strong> tu canica cae en el hoyo 6 y desaparece. Puedes volver a lanzar o pasar.</li>
-          <li><strong>Si sale 1-5 y el hoyo está vacío:</strong> colocas una canica ahí. Puedes volver a lanzar o pasar.</li>
-          <li><strong>Si sale 1-5 y el hoyo está ocupado:</strong> te llevas esa canica (+1) y pierdes el turno.</li>
-        </ul>
+
+      <!-- Contenedor con scroll-reveal: el texto se ilumina al scrollear -->
+      <div id="rulesScroll" class="gradient-scroll flex-1 overflow-y-auto pr-2 my-3" style="color:#e9d9b6">
+        <div class="gradient-scroll-inner text-base leading-relaxed space-y-4 py-2" data-gradient-scroll>
+          <p><strong>Objetivo:</strong> ser el primer jugador en quedarse con 0 canicas.</p>
+          <p>El tablero tiene 6 hoyos. Los hoyos 1, 2, 3, 4 y 5 sostienen canicas. El hoyo 6 es un pozo profundo.</p>
+          <p>En tu turno, lanzas el dado. Debes hacer clic en la casilla indicada por el dado.</p>
+          <p>¡Cuidado! Si haces clic en la casilla equivocada, recibes +1 canica de castigo y tu turno termina.</p>
+          <p>Si sale 6: tu canica cae en el hoyo 6 y desaparece. Puedes volver a lanzar o pasar.</p>
+          <p>Si sale 1 a 5 y el hoyo está vacío: colocas una canica ahí. Puedes volver a lanzar o pasar.</p>
+          <p>Si sale 1 a 5 y el hoyo está ocupado: te llevas esa canica (+1) y pierdes el turno.</p>
+          <p style="color:var(--col-yellow)">¡Buena suerte! Que gane el que primero se quede sin canicas.</p>
+        </div>
       </div>
-      <button onclick="closeRulesModal()" class="btn-primary lift w-full py-3 rounded-xl text-lg">¡Entendido!</button>
+
+      <button onclick="closeRulesModal()" class="btn-primary lift w-full py-3 rounded-xl text-lg shrink-0">¡Entendido!</button>
     </div>
   </div>
 
-  <!-- Assets gráficos (SVG) + título animado + lógica -->
+  <!-- Assets gráficos (SVG) + título animado + reglas scroll + lógica -->
   <script src="assets.js"></script>
   <script src="stroketext.js"></script>
+  <script src="gradientscroll.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

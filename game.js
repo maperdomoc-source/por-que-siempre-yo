@@ -1207,7 +1207,15 @@ function copyRoomCode() {
 // ============================================================
 //  MODALES (Reglas) + sonido toggle + temas
 // ============================================================
-function openRulesModal()  { document.getElementById('rulesModal').classList.remove('hidden'); }
+function openRulesModal() {
+  document.getElementById('rulesModal').classList.remove('hidden');
+  // Inicializar el efecto scroll-reveal cuando el modal ya es visible
+  const scrollEl = document.getElementById('rulesScroll');
+  if (scrollEl) scrollEl.scrollTop = 0;
+  if (typeof initGradientScrolls === 'function') {
+    requestAnimationFrame(() => initGradientScrolls());
+  }
+}
 function closeRulesModal() { document.getElementById('rulesModal').classList.add('hidden'); }
 
 function toggleSound() {
