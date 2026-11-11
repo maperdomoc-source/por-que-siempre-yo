@@ -216,9 +216,16 @@ function buildStrokeTitle(host, opts = {}) {
     stopFloat();
     play();
 
-    if (opts.hoverRedraw !== false) {
+    // Redibujar al pasar el mouse. Guard para no reiniciar en pleno dibujo
+    // ni dispararlo repetidamente (evita el parpadeo). Tras el redibujo,
+    // startFloat vuelve a activar la flotación continua.
+    if (opts.hoverRedraw !== false && !host._gsHoverBound) {
+      host._gsHoverBound = true;
       host.addEventListener('pointerenter', () => {
-        if (!tl || tl.progress() < 1) return;
+        if (!tl || tl.progress() < 1) return;      // aún dibujando → ignorar
+        if (host._gsRedrawLock) return;            // evitar repeticiones seguidas
+        host._gsRedrawLock = true;
+        setTimeout(() => { host._gsRedrawLock = false; }, 1200);
         play();
       });
     }
@@ -282,8 +289,8 @@ function buildStrokeTitle(host, opts = {}) {
 function renderStrokeTitles() {
   document.querySelectorAll('[data-stroke-title]').forEach(host => {
     const fs = parseInt(host.getAttribute('data-title-fontsize') || '60', 10);
-    // hoverRedraw desactivado: evita que el título se redibuje (glitch) al
-    // pasar el mouse por el header durante el juego.
-    buildStrokeTitle(host, { fontSize: fs, hoverRedraw: false });
+    // hoverRedraw activo: al pasar el mouse se redibuja el título, y luego
+    // vuelve a flotar (con guard anti-parpadeo).
+    buildStrokeTitle(host, { fontSize: fs, hoverRedraw: true });
   });
 }
