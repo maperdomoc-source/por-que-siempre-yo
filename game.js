@@ -204,6 +204,9 @@ window.addEventListener('DOMContentLoaded', () => {
   // Renderizar el título animado (StrokeText) con canicas en las "O"
   if (typeof renderStrokeTitles === 'function') renderStrokeTitles();
 
+  // Cara inicial del dado ("?")
+  renderDiceFace('?');
+
   // Restaurar nombre de usuario guardado (se comparte entre 1vsBOT y Online)
   const savedName = localStorage.getItem('pqsy_name');
   if (savedName) {
@@ -351,8 +354,7 @@ function resetRoundState() {
   gameState.rematchVotes = {};
   const pit = document.getElementById('pitMarbles');
   if (pit) pit.innerHTML = '';
-  const diceVal = document.getElementById('diceValue');
-  if (diceVal) diceVal.innerText = '?';
+  renderDiceFace('?');
   // Limpiar lágrimas de una derrota anterior
   const tears = document.getElementById('tearsLayer');
   if (tears) tears.innerHTML = '';
@@ -505,14 +507,52 @@ function handleRollDice() {
 }
 
 // Anima el dado localmente (usado por todos los dispositivos)
+// Posiciones de los pips en el grid 3x3 (1..9) para cada valor del dado.
+const DICE_PIP_LAYOUT = {
+  1: [5],
+  2: [1, 9],
+  3: [1, 5, 9],
+  4: [1, 3, 7, 9],
+  5: [1, 3, 5, 7, 9],
+  6: [1, 3, 4, 6, 7, 9],
+};
+
+// Dibuja la cara del dado con puntos negros (o "?" si value es null/"?").
+function renderDiceFace(value) {
+  const face = document.getElementById('diceFace');
+  if (!face) return;
+  face.innerHTML = '';
+  if (value === null || value === undefined || value === '?' ) {
+    const q = document.createElement('div');
+    q.className = 'q';
+    q.textContent = '?';
+    face.appendChild(q);
+    return;
+  }
+  const pips = DICE_PIP_LAYOUT[value] || [];
+  for (let cell = 1; cell <= 9; cell++) {
+    const c = document.createElement('div');
+    c.className = 'cell';
+    if (pips.includes(cell)) {
+      const pip = document.createElement('div');
+      pip.className = 'pip';
+      c.appendChild(pip);
+    }
+    face.appendChild(c);
+  }
+}
+
 function animateDice(rolledValue, playerName) {
   const diceEl = document.getElementById('dice3d');
-  const diceValEl = document.getElementById('diceValue');
   if (diceEl) diceEl.classList.add('dice-rolling');
   playDiceSound();
   logAction(`${playerName} está lanzando el dado...`);
+  // Durante el giro, mostrar caras aleatorias para dar sensación de rodar
+  let ticks = 0;
+  const spin = setInterval(() => { renderDiceFace(Math.floor(Math.random() * 6) + 1); if (++ticks > 4) clearInterval(spin); }, 110);
   setTimeout(() => {
-    if (diceValEl) diceValEl.innerText = rolledValue;
+    clearInterval(spin);
+    renderDiceFace(rolledValue);
     if (diceEl) diceEl.classList.remove('dice-rolling');
   }, 600);
 }
@@ -1109,8 +1149,7 @@ function handleIncomingNetworkData(conn, data) {
         gameState.currentDiceValue = data.currentDiceValue;
         gameState.isGameOver = data.isGameOver;
         if (data.actionText) logAction(data.actionText);
-        const diceValEl = document.getElementById('diceValue');
-        if (diceValEl && data.currentDiceValue) diceValEl.innerText = data.currentDiceValue;
+        if (data.currentDiceValue) renderDiceFace(data.currentDiceValue);
         renderBoardHoles();
         renderPlayersPanel();
         updateTurnUI();

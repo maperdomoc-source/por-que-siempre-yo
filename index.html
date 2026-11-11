@@ -206,14 +206,13 @@
         </div>
 
         <div class="flex flex-col items-center justify-center gap-3">
-          <!-- El dado ES el botón: se toca para lanzar -->
+          <!-- El dado ES el botón: se toca para lanzar. Cara con pips (puntos). -->
           <div id="dice3d" class="dice-3d" onclick="handleDiceTap()">
-            <span id="diceValue" class="font-display text-4xl font-extrabold">?</span>
+            <div id="diceFace" class="dice-face"></div>
           </div>
           <p id="diceHint" class="dice-hint text-center"></p>
-          <p id="actionLog" class="text-base font-sans text-center min-h-[44px] flex items-center justify-center px-2 leading-snug" style="color:var(--col-yellow)">
-            ¡Toca el dado para empezar!
-          </p>
+          <!-- actionLog oculto: se conserva por compatibilidad del JS -->
+          <p id="actionLog" class="hidden"></p>
         </div>
 
         <button id="btnPass" onclick="handlePassTurn()" disabled class="btn-secondary w-full py-3 rounded-2xl font-sans font-bold text-base opacity-40 cursor-not-allowed flex items-center justify-center gap-2">
