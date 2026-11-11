@@ -468,8 +468,8 @@ function updateTurnUI() {
   if (btnPass) {
     btnPass.disabled = !isMyTurn || !gameState.hasPlacedThisTurn || gameState.isRolling || gameState.isWaitingForHoleClick || curPlayer.isBot || gameState.isGameOver;
     btnPass.className = btnPass.disabled
-      ? "btn-secondary w-full py-3 rounded-2xl font-sans font-bold text-base opacity-40 cursor-not-allowed flex items-center justify-center gap-2"
-      : "btn-secondary lift w-full py-3 rounded-2xl font-sans font-bold text-base flex items-center justify-center gap-2";
+      ? "btn-pass w-full py-3 rounded-2xl flex items-center justify-center opacity-40 cursor-not-allowed"
+      : "btn-pass lift w-full py-3 rounded-2xl flex items-center justify-center";
   }
 }
 

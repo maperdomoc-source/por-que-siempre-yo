@@ -282,6 +282,8 @@ function buildStrokeTitle(host, opts = {}) {
 function renderStrokeTitles() {
   document.querySelectorAll('[data-stroke-title]').forEach(host => {
     const fs = parseInt(host.getAttribute('data-title-fontsize') || '60', 10);
-    buildStrokeTitle(host, { fontSize: fs });
+    // hoverRedraw desactivado: evita que el título se redibuje (glitch) al
+    // pasar el mouse por el header durante el juego.
+    buildStrokeTitle(host, { fontSize: fs, hoverRedraw: false });
   });
 }
