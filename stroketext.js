@@ -13,12 +13,12 @@ const SVGNS = 'http://www.w3.org/2000/svg';
 
 // Palabras del título con su color. ⊙ marca la posición de una canica.
 const TITLE_SEGMENTS = [
-  { text: '¿P⊙R',    color: '#9fa650', signAt: [0] },
-  { text: 'QUÉ',     color: '#9fa650' },
-  { text: 'SIEMPRE', color: '#0b46cd' },
-  { text: 'Y⊙?',     color: '#e44c50', signAt: [2] },
+  { text: '¿P⊙R',    color: '#ebc254', signAt: [0] },  // POR QUÉ = amarillo; ¿ = verde
+  { text: 'QUÉ',     color: '#ebc254' },
+  { text: 'SIEMPRE', color: '#0b46cd' },               // azul
+  { text: 'Y⊙?',     color: '#e44c50', signAt: [2] },  // YO = rojo; ? = verde
 ];
-const SIGN_COLOR = '#ebc254';
+const SIGN_COLOR = '#9fa650';                           // signos de interrogación = verde
 
 function buildStrokeTitle(host, opts = {}) {
   const fontSize = opts.fontSize || 60;

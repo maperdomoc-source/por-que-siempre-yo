@@ -30,13 +30,13 @@ function svgMarble(idSuffix = '') {
     <g clip-path="url(#ball${s})">
       <path d="M62 10 C28 30, 72 55, 38 78 C30 83, 30 90, 36 92
                C44 88, 42 80, 50 74 C84 52, 40 30, 70 14 Z"
-            fill="#ffd21e" opacity="0.92"/>
+            fill="#ebc254" opacity="0.95"/>
       <path d="M57 11 C25 31, 67 54, 34 77 C40 84, 46 84, 50 80
                C80 56, 38 33, 64 13 Z"
-            fill="#0b3fae" opacity="0.92"/>
+            fill="#0b46cd" opacity="0.95"/>
       <path d="M52 12 C22 32, 60 53, 30 76 C36 82, 44 82, 48 78
                C74 58, 34 35, 58 14 Z"
-            fill="#d8232a" opacity="0.9"/>
+            fill="#e44c50" opacity="0.92"/>
     </g>
 
     <!-- borde oscuro de volumen -->
@@ -52,13 +52,13 @@ function svgMarble(idSuffix = '') {
 const STICKER_CHIVA = `
 <svg viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg">
   <g>
-    <rect x="18" y="34" width="86" height="34" rx="6" fill="#e23b3b" stroke="#fff" stroke-width="3"/>
-    <rect x="18" y="44" width="86" height="8" fill="#f2c200"/>
-    <rect x="18" y="52" width="86" height="8" fill="#1f6fd0"/>
-    <rect x="24" y="24" width="74" height="12" rx="4" fill="#3aa655" stroke="#fff" stroke-width="2"/>
-    <rect x="30" y="16" width="20" height="10" rx="2" fill="#f2c200"/>
-    <rect x="54" y="16" width="20" height="10" rx="2" fill="#e23b3b"/>
-    <rect x="78" y="16" width="16" height="10" rx="2" fill="#1f6fd0"/>
+    <rect x="18" y="34" width="86" height="34" rx="6" fill="#e44c50" stroke="#fff" stroke-width="3"/>
+    <rect x="18" y="44" width="86" height="8" fill="#ebc254"/>
+    <rect x="18" y="52" width="86" height="8" fill="#0b46cd"/>
+    <rect x="24" y="24" width="74" height="12" rx="4" fill="#9fa650" stroke="#fff" stroke-width="2"/>
+    <rect x="30" y="16" width="20" height="10" rx="2" fill="#ebc254"/>
+    <rect x="54" y="16" width="20" height="10" rx="2" fill="#e44c50"/>
+    <rect x="78" y="16" width="16" height="10" rx="2" fill="#0b46cd"/>
     <rect x="26" y="40" width="12" height="12" rx="2" fill="#bfe3ff"/>
     <rect x="44" y="40" width="12" height="12" rx="2" fill="#bfe3ff"/>
     <rect x="62" y="40" width="12" height="12" rx="2" fill="#bfe3ff"/>
@@ -85,11 +85,11 @@ const STICKER_SOMBRERO = `
 
 const STICKER_CANASTA = `
 <svg viewBox="0 0 110 100" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="40" cy="40" r="13" fill="#e23b3b"/>
-  <circle cx="62" cy="36" r="12" fill="#f2a900"/>
-  <circle cx="52" cy="30" r="10" fill="#8bc34a"/>
-  <path d="M70 44 q8 -2 10 6 q-8 4 -12 -2 Z" fill="#f2c200"/>
-  <path d="M30 44 q-8 0 -8 8 q8 2 11 -4 Z" fill="#f2c200"/>
+  <circle cx="40" cy="40" r="13" fill="#e44c50"/>
+  <circle cx="62" cy="36" r="12" fill="#ebc254"/>
+  <circle cx="52" cy="30" r="10" fill="#9fa650"/>
+  <path d="M70 44 q8 -2 10 6 q-8 4 -12 -2 Z" fill="#ebc254"/>
+  <path d="M30 44 q-8 0 -8 8 q8 2 11 -4 Z" fill="#ebc254"/>
   <path d="M22 52 h66 l-8 34 a6 6 0 0 1 -6 5 h-32 a6 6 0 0 1 -6 -5 Z"
         fill="#c88a4a" stroke="#8a5a2b" stroke-width="2"/>
   <g stroke="#8a5a2b" stroke-width="2">

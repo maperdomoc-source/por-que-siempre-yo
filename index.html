@@ -95,7 +95,7 @@
           </div>
 
           <div class="rounded-2xl p-3 space-y-2" style="background:rgba(36,22,12,0.55);border:1px solid rgba(255,220,170,0.12)">
-            <h3 class="font-bold text-base" style="color:#6ea8ff">Unirme a una sala</h3>
+            <h3 class="font-bold text-base" style="color:#0b46cd">Unirme a una sala</h3>
             <input type="text" id="joinRoomCodeInput" placeholder="EJ: X8KA" maxlength="6" class="col-input w-full rounded-lg px-3 py-2 text-center font-mono text-lg uppercase" style="color:var(--col-yellow)">
             <button onclick="joinOnlineRoom()" id="btnJoinRoom" class="btn-blue lift w-full py-2.5 rounded-xl font-bold text-base">Unirse</button>
           </div>
@@ -108,7 +108,7 @@
             <span id="roomCodeText" class="font-mono font-extrabold text-3xl tracking-widest" style="color:var(--col-yellow)">----</span>
             <button onclick="copyRoomCode()" class="lift p-2 rounded-lg text-base" style="background:rgba(90,58,34,0.9);color:#e9d9b6"><i class="fa-solid fa-copy"></i></button>
           </div>
-          <p id="roomConnectedCount" class="text-sm font-bold" style="color:#8bd48b">Conectados: 1</p>
+          <p id="roomConnectedCount" class="text-sm font-bold" style="color:#9fa650">Conectados: 1</p>
           <button id="btnStartOnlineGame" onclick="startHostOnlineGame()" class="btn-red lift w-full py-2.5 mt-1 rounded-xl font-bold text-base">Iniciar partida</button>
         </div>
       </div>
@@ -131,7 +131,7 @@
       <!-- Botones flotantes en la esquina, sin empujar el título -->
       <div class="absolute top-3 right-4 flex items-center gap-2">
         <div id="onlineBadge" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-sans" style="background:rgba(36,22,12,0.6)">
-          <span id="onlineDot" class="w-2.5 h-2.5 rounded-full animate-pulse" style="background:#8bd48b"></span>
+          <span id="onlineDot" class="w-2.5 h-2.5 rounded-full animate-pulse" style="background:#9fa650"></span>
           <span id="onlineText" class="font-bold" style="color:#e9d9b6">Online</span>
         </div>
         <button onclick="toggleSound()" title="Sonido" class="lift flex items-center justify-center p-1.5 text-xl" style="color:#ffe399;background:none">
@@ -244,9 +244,9 @@
 
       <!-- PERDEDOR -->
       <div id="loseView" class="w-full flex flex-col items-center gap-5 hidden">
-        <div class="text-7xl sad-shake" style="color:#6ea8ff"><i class="fa-solid fa-face-sad-tear"></i></div>
+        <div class="text-7xl sad-shake" style="color:#0b46cd"><i class="fa-solid fa-face-sad-tear"></i></div>
         <h2 class="mega-title text-4xl sm:text-5xl" style="color:var(--col-blue)">¡PERDISTE!</h2>
-        <div class="panel-card rounded-3xl px-8 py-6 w-full" style="border-color:rgba(110,168,255,0.4)">
+        <div class="panel-card rounded-3xl px-8 py-6 w-full" style="border-color:rgba(11,70,205,0.4)">
           <p class="font-sans text-lg" style="color:#e9d9b6">Esta vez ganó</p>
           <p id="loserWinnerName" class="font-display text-3xl mt-1 break-words" style="color:var(--col-red)">Jugador</p>
           <p class="font-sans text-sm mt-2" style="color:#c9b690">¡Más suerte la próxima! 😢</p>
@@ -280,7 +280,7 @@
         <ul class="list-disc list-inside space-y-2">
           <li>El tablero tiene 6 hoyos. Los hoyos <strong>1, 2, 3, 4 y 5</strong> sostienen canicas. El hoyo <strong>6</strong> es un pozo profundo.</li>
           <li>En tu turno, lanzas el dado. <strong>Debes hacer clic en la casilla indicada por el dado.</strong></li>
-          <li style="color:#ff9a9a"><strong>¡Cuidado!</strong> Si haces clic en la casilla equivocada, recibes <strong>+1 canica de castigo</strong> y tu turno termina.</li>
+          <li style="color:#e44c50"><strong>¡Cuidado!</strong> Si haces clic en la casilla equivocada, recibes <strong>+1 canica de castigo</strong> y tu turno termina.</li>
           <li><strong>Si sale 6:</strong> tu canica cae en el hoyo 6 y desaparece. Puedes volver a lanzar o pasar.</li>
           <li><strong>Si sale 1-5 y el hoyo está vacío:</strong> colocas una canica ahí. Puedes volver a lanzar o pasar.</li>
           <li><strong>Si sale 1-5 y el hoyo está ocupado:</strong> te llevas esa canica (+1) y pierdes el turno.</li>
