@@ -192,11 +192,11 @@ body, .screen-overlay, #gameScreen {
 /* ============================================================
    REGLAS con scroll-reveal (TextGradientScroll)
    ============================================================ */
-.gradient-scroll { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+.gradient-scroll { -webkit-overflow-scrolling: touch; }
 .gs-word {
   display: inline;
-  opacity: 0.12;                 /* arranca tenue; el JS la sube con el scroll */
-  transition: opacity 0.35s ease;
+  opacity: 0.03;                 /* casi invisible; el JS la revela con el scroll */
+  transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* ============================================================
